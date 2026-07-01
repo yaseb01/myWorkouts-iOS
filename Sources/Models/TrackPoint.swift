@@ -11,7 +11,6 @@ final class TrackPoint {
     var speed: Double?
     var course: Double?
 
-    @Relationship(inverse: \Workout.trackPoints)
     var workout: Workout?
 
     init(timestamp: Date = Date(), latitude: Double, longitude: Double, altitude: Double? = nil,

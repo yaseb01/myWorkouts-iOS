@@ -58,13 +58,19 @@ final class myWorkoutsInfoPlistTests: XCTestCase {
     // MARK: - Helpers
 
     private func loadInfoPlist() -> [String: Any] {
-        // Try loading from the test bundle's parent (the app bundle)
-        if let path = Bundle(for: type(of: self)).path(forResource: "Info", ofType: "plist"),
+        // App-hosted tests: test bundle lives inside myWorkouts.app/PlugIns/myWorkoutsTests.xctest
+        // Navigate up two levels to reach the app bundle
+        let testBundle = Bundle(for: type(of: self))
+        let appBundleURL = testBundle.bundleURL
+            .deletingLastPathComponent() // exit myWorkoutsTests.xctest
+            .deletingLastPathComponent() // exit PlugIns
+        if let appBundle = Bundle(url: appBundleURL),
+           let path = appBundle.path(forResource: "Info", ofType: "plist"),
            let plist = NSDictionary(contentsOfFile: path) as? [String: Any] {
             return plist
         }
 
-        // Fallback: try the main bundle (works when running as app test)
+        // Fallback: try the main bundle
         if let path = Bundle.main.path(forResource: "Info", ofType: "plist"),
            let plist = NSDictionary(contentsOfFile: path) as? [String: Any] {
             return plist

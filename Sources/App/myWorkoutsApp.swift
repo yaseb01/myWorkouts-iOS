@@ -7,7 +7,7 @@ struct myWorkoutsApp: App {
     @State private var sensorManager = SensorManager()
     @State private var workoutRecorder = WorkoutRecorder()
 
-    var modelContainer: ModelContainer {
+    private let _modelContainer: ModelContainer = {
         let schema = Schema([
             Workout.self,
             TrackPoint.self,
@@ -23,7 +23,9 @@ struct myWorkoutsApp: App {
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
-    }
+    }()
+
+    var modelContainer: ModelContainer { _modelContainer }
 
     var body: some Scene {
         WindowGroup {

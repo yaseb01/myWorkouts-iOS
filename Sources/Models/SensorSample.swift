@@ -8,7 +8,6 @@ final class SensorSample {
     var value: Double
     var unit: String
 
-    @Relationship(inverse: \Workout.sensorSamples)
     var workout: Workout?
 
     init(timestamp: Date = Date(), type: SensorType, value: Double, unit: String) {

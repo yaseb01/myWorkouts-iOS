@@ -2,6 +2,7 @@ import XCTest
 import SwiftData
 @testable import myWorkouts
 
+@MainActor
 final class myWorkoutsIntegrationTests: XCTestCase {
 
     // MARK: - ModelContainer Registration
