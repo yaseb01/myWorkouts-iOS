@@ -3,6 +3,8 @@ import SwiftUI
 struct WorkoutSetupView: View {
     @Environment(WorkoutRecorder.self) private var recorder
 
+    var supportsVoiceOver: Bool { true }
+
     var body: some View {
         List {
             Section("Sport Type") {

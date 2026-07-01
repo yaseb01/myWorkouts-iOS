@@ -7,6 +7,9 @@ struct myWorkoutsApp: App {
     @State private var sensorManager = SensorManager()
     @State private var workoutRecorder = WorkoutRecorder()
 
+    var errorMessage: String?
+    var showErrorAlert = false
+
     private let _modelContainer: ModelContainer = {
         let schema = Schema([
             Workout.self,

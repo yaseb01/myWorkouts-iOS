@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
+    var supportsVoiceOver: Bool { true }
+
     var body: some View {
         List {
             Section("Bio Data") {

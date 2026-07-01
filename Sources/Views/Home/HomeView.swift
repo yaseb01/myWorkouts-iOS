@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    var supportsVoiceOver: Bool { true }
+
     var body: some View {
         List {
             Section("Last Workout") {

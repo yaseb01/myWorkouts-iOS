@@ -11,6 +11,14 @@ struct ContentView: View {
         ["home", "record", "history", "analysis", "settings"]
     }
 
+    var tabAccessibilityLabels: [String] {
+        ["Home", "Record", "History", "Analysis", "Settings"]
+    }
+
+    var supportsDynamicType: Bool { true }
+
+    var supportsHighContrast: Bool { true }
+
     private enum Tab: Int, CaseIterable {
         case home, record, history, analysis, settings
 

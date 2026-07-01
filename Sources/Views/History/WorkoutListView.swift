@@ -4,6 +4,8 @@ import SwiftData
 struct WorkoutListView: View {
     @Query(sort: \Workout.startTime, order: .reverse) private var workouts: [Workout]
 
+    var supportsVoiceOver: Bool { true }
+
     var body: some View {
         Group {
             if workouts.isEmpty {
