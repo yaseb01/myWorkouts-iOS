@@ -30,6 +30,7 @@
 		AA0000000000000000000021 /* AnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000025 /* AnalysisView.swift */; };
 		AA0000000000000000000022 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000026 /* SettingsView.swift */; };
 		AA0000000000000000000023 /* myWorkoutsIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */; };
+		AA0000000000000000000024 /* myWorkoutsProjectStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000028 /* myWorkoutsProjectStructureTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		AB0000000000000000000025 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000026 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myWorkoutsIntegrationTests.swift; sourceTree = "<group>"; };
+		AB0000000000000000000028 /* myWorkoutsProjectStructureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myWorkoutsProjectStructureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,13 +122,14 @@
 			path = myWorkouts;
 			sourceTree = "<group>";
 		};
-		AD0000000000000000000006 /* myWorkoutsTests */ = {
+			AD0000000000000000000006 /* myWorkoutsTests */ = {
 			isa = PBXGroup;
 			children = (
 				AB0000000000000000000003 /* myWorkoutsTabBarTests.swift */,
 				AB0000000000000000000004 /* myWorkoutsInfoPlistTests.swift */,
 				AB0000000000000000000005 /* myWorkoutsAppEntryTests.swift */,
 				AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */,
+				AB0000000000000000000028 /* myWorkoutsProjectStructureTests.swift */,
 			);
 			path = myWorkoutsTests;
 			sourceTree = "<group>";
@@ -337,7 +340,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AC0000000000000000000005 /* Sources */ = {
+			AC0000000000000000000005 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -345,6 +348,7 @@
 				AA0000000000000000000004 /* myWorkoutsInfoPlistTests.swift in Sources */,
 				AA0000000000000000000005 /* myWorkoutsAppEntryTests.swift in Sources */,
 				AA0000000000000000000023 /* myWorkoutsIntegrationTests.swift in Sources */,
+				AA0000000000000000000024 /* myWorkoutsProjectStructureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
