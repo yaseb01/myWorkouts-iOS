@@ -1,5 +1,10 @@
 # Implementation Plan: myWorkouts iOS App
 
+> [!NOTE]
+> This document may not reflect the current implementation.
+> See the final report for up-to-date state:
+> [Final Report](../reports/myworkouts.md)
+
 ## Phase 1: Project Scaffold + Data Models + Settings
 
 ### T1: Xcode Project Scaffold

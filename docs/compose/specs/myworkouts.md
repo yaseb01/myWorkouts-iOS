@@ -1,5 +1,10 @@
 # Specification: myWorkouts iOS App
 
+> [!NOTE]
+> This document may not reflect the current implementation.
+> See the final report for up-to-date state:
+> [Final Report](../reports/myworkouts.md)
+
 ## Overview
 
 Native iOS fitness tracking app built with SwiftUI + SwiftData. 5-tab navigation (Home, Record, History, Analysis, Settings). Local-only data storage, no cloud sync. BLE heart rate sensor integration. GPX import/export. Targets iPhone, iOS 17+.
