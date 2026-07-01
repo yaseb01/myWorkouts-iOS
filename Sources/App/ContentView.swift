@@ -38,49 +38,55 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                Text("Home")
+                HomeView()
                     .navigationTitle("Home")
             }
             .tabItem {
                 Label("Home", systemImage: "house")
             }
             .tag(0)
+            .accessibilityLabel("Home tab")
 
             NavigationStack {
-                Text("Record")
+                WorkoutSetupView()
                     .navigationTitle("Record")
             }
             .tabItem {
                 Label("Record", systemImage: "circle.fill")
             }
             .tag(1)
+            .accessibilityLabel("Record tab")
 
             NavigationStack {
-                Text("History")
+                WorkoutListView()
                     .navigationTitle("History")
             }
             .tabItem {
                 Label("History", systemImage: "clock.arrow.circlepath")
             }
             .tag(2)
+            .accessibilityLabel("History tab")
 
             NavigationStack {
-                Text("Analysis")
+                AnalysisView()
                     .navigationTitle("Analysis")
             }
             .tabItem {
                 Label("Analysis", systemImage: "chart.line.uptrend.xyaxis")
             }
             .tag(3)
+            .accessibilityLabel("Analysis tab")
 
             NavigationStack {
-                Text("Settings")
+                SettingsView()
                     .navigationTitle("Settings")
             }
             .tabItem {
                 Label("Settings", systemImage: "gearshape")
             }
             .tag(4)
+            .accessibilityLabel("Settings tab")
         }
+        .accessibilityElement(children: .contain)
     }
 }

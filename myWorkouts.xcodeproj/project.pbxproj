@@ -13,6 +13,23 @@
 		AA0000000000000000000004 /* myWorkoutsInfoPlistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000004 /* myWorkoutsInfoPlistTests.swift */; };
 		AA0000000000000000000005 /* myWorkoutsAppEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000005 /* myWorkoutsAppEntryTests.swift */; };
 		AA0000000000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000006 /* Assets.xcassets */; };
+		AA0000000000000000000007 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000011 /* Enums.swift */; };
+		AA0000000000000000000008 /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000012 /* Workout.swift */; };
+		AA0000000000000000000009 /* TrackPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000013 /* TrackPoint.swift */; };
+		AA0000000000000000000010 /* SensorSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000014 /* SensorSample.swift */; };
+		AA0000000000000000000011 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000015 /* Goal.swift */; };
+		AA0000000000000000000012 /* SportType.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000016 /* SportType.swift */; };
+		AA0000000000000000000013 /* HeartRateZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000017 /* HeartRateZone.swift */; };
+		AA0000000000000000000014 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000018 /* UserProfile.swift */; };
+		AA0000000000000000000015 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000019 /* LocationManager.swift */; };
+		AA0000000000000000000016 /* SensorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000020 /* SensorManager.swift */; };
+		AA0000000000000000000017 /* WorkoutRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000021 /* WorkoutRecorder.swift */; };
+		AA0000000000000000000018 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000022 /* HomeView.swift */; };
+		AA0000000000000000000019 /* WorkoutSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000023 /* WorkoutSetupView.swift */; };
+		AA0000000000000000000020 /* WorkoutListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000024 /* WorkoutListView.swift */; };
+		AA0000000000000000000021 /* AnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000025 /* AnalysisView.swift */; };
+		AA0000000000000000000022 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000026 /* SettingsView.swift */; };
+		AA0000000000000000000023 /* myWorkoutsIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +43,23 @@
 		AB0000000000000000000008 /* myWorkouts.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = myWorkouts.entitlements; sourceTree = "<group>"; };
 		AB0000000000000000000009 /* myWorkouts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myWorkouts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0000000000000000000010 /* myWorkoutsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = myWorkoutsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB0000000000000000000011 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		AB0000000000000000000012 /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
+		AB0000000000000000000013 /* TrackPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackPoint.swift; sourceTree = "<group>"; };
+		AB0000000000000000000014 /* SensorSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorSample.swift; sourceTree = "<group>"; };
+		AB0000000000000000000015 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
+		AB0000000000000000000016 /* SportType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportType.swift; sourceTree = "<group>"; };
+		AB0000000000000000000017 /* HeartRateZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateZone.swift; sourceTree = "<group>"; };
+		AB0000000000000000000018 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		AB0000000000000000000019 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		AB0000000000000000000020 /* SensorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManager.swift; sourceTree = "<group>"; };
+		AB0000000000000000000021 /* WorkoutRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecorder.swift; sourceTree = "<group>"; };
+		AB0000000000000000000022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000023 /* WorkoutSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSetupView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000024 /* WorkoutListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutListView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000025 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000026 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myWorkoutsIntegrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +94,9 @@
 			isa = PBXGroup;
 			children = (
 				AD0000000000000000000003 /* App */,
+				AD0000000000000000000010 /* Models */,
+				AD0000000000000000000011 /* Services */,
+				AD0000000000000000000012 /* Views */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -89,6 +126,7 @@
 				AB0000000000000000000003 /* myWorkoutsTabBarTests.swift */,
 				AB0000000000000000000004 /* myWorkoutsInfoPlistTests.swift */,
 				AB0000000000000000000005 /* myWorkoutsAppEntryTests.swift */,
+				AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */,
 			);
 			path = myWorkoutsTests;
 			sourceTree = "<group>";
@@ -100,6 +138,83 @@
 				AB0000000000000000000010 /* myWorkoutsTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000010 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000011 /* Enums.swift */,
+				AB0000000000000000000012 /* Workout.swift */,
+				AB0000000000000000000013 /* TrackPoint.swift */,
+				AB0000000000000000000014 /* SensorSample.swift */,
+				AB0000000000000000000015 /* Goal.swift */,
+				AB0000000000000000000016 /* SportType.swift */,
+				AB0000000000000000000017 /* HeartRateZone.swift */,
+				AB0000000000000000000018 /* UserProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000011 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000019 /* LocationManager.swift */,
+				AB0000000000000000000020 /* SensorManager.swift */,
+				AB0000000000000000000021 /* WorkoutRecorder.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000012 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AD0000000000000000000020 /* Home */,
+				AD0000000000000000000021 /* Record */,
+				AD0000000000000000000022 /* History */,
+				AD0000000000000000000023 /* Analysis */,
+				AD0000000000000000000024 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000020 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000022 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000021 /* Record */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000023 /* WorkoutSetupView.swift */,
+			);
+			path = Record;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000022 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000024 /* WorkoutListView.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000023 /* Analysis */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000025 /* AnalysisView.swift */,
+			);
+			path = Analysis;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000024 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000026 /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -203,6 +318,22 @@
 			files = (
 				AA0000000000000000000001 /* myWorkoutsApp.swift in Sources */,
 				AA0000000000000000000002 /* ContentView.swift in Sources */,
+				AA0000000000000000000007 /* Enums.swift in Sources */,
+				AA0000000000000000000008 /* Workout.swift in Sources */,
+				AA0000000000000000000009 /* TrackPoint.swift in Sources */,
+				AA0000000000000000000010 /* SensorSample.swift in Sources */,
+				AA0000000000000000000011 /* Goal.swift in Sources */,
+				AA0000000000000000000012 /* SportType.swift in Sources */,
+				AA0000000000000000000013 /* HeartRateZone.swift in Sources */,
+				AA0000000000000000000014 /* UserProfile.swift in Sources */,
+				AA0000000000000000000015 /* LocationManager.swift in Sources */,
+				AA0000000000000000000016 /* SensorManager.swift in Sources */,
+				AA0000000000000000000017 /* WorkoutRecorder.swift in Sources */,
+				AA0000000000000000000018 /* HomeView.swift in Sources */,
+				AA0000000000000000000019 /* WorkoutSetupView.swift in Sources */,
+				AA0000000000000000000020 /* WorkoutListView.swift in Sources */,
+				AA0000000000000000000021 /* AnalysisView.swift in Sources */,
+				AA0000000000000000000022 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +344,7 @@
 				AA0000000000000000000003 /* myWorkoutsTabBarTests.swift in Sources */,
 				AA0000000000000000000004 /* myWorkoutsInfoPlistTests.swift in Sources */,
 				AA0000000000000000000005 /* myWorkoutsAppEntryTests.swift in Sources */,
+				AA0000000000000000000023 /* myWorkoutsIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
