@@ -143,20 +143,19 @@ struct HomeView: View {
             Text("STATISTICS OVERVIEW")
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
-                .padding(.horizontal)
                 .padding(.bottom, 8)
 
             // Column headers
             HStack(spacing: 0) {
-                Color.clear.frame(width: 80)
+                Color.clear.frame(width: 72)
                 ForEach(Array(statHeaders.enumerated()), id: \.offset) { index, header in
                     Text(header)
                         .font(.caption2)
+                        .multilineTextAlignment(.center)
                         .foregroundStyle(index == 0 ? .green : .white)
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.horizontal, 4)
             .padding(.bottom, 4)
 
             // Stat rows
@@ -167,7 +166,6 @@ struct HomeView: View {
                 statRow(label: "Distance", values: stats.map { $0.distance }, goalValue: stats[0].distance, mode: displayMode)
                 statRow(label: "Incline", values: stats.map { $0.elevation }, goalValue: stats[0].elevation, mode: displayMode)
             }
-            .padding(.horizontal)
 
             // Toggle button
             HStack {
@@ -180,16 +178,15 @@ struct HomeView: View {
                     Text(displayMode == .percentage ? "RELATIVE TO REFERENCE" : "ABSOLUTE VALUES")
                         .font(.caption.bold())
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 10)
                         .background(Color(.systemGray4))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
                 Spacer()
             }
-            .padding(.top, 8)
+            .padding(.top, 10)
         }
-        .padding(.vertical, 8)
     }
 
     private var statHeaders: [String] {
@@ -201,7 +198,7 @@ struct HomeView: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.white)
-                .frame(width: 80, alignment: .leading)
+                .frame(width: 72, alignment: .leading)
 
             ForEach(Array(values.enumerated()), id: \.offset) { index, value in
                 let result = cellContent(label: label, value: value, goalValue: goalValue, index: index, mode: mode)
@@ -209,7 +206,7 @@ struct HomeView: View {
                     .font(.caption.monospacedDigit().bold())
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 5)
+                    .padding(.vertical, 6)
                     .background(result.color)
                     .clipShape(RoundedRectangle(cornerRadius: 2))
             }
