@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 enum WorkoutState: Equatable {
     case idle
@@ -17,8 +18,12 @@ final class WorkoutRecorder {
     var hasIncompleteWorkout: Bool = false
     var trackPoints: [TrackPointData] = []
     var sensorSamples: [SensorSampleData] = []
+    var currentHeartRate: Int = 0
 
     private var timer: Timer?
+    private var autoSaveTimer: Timer?
+    private var lastLocationTimestamp: Date?
+    private var lastAltitude: Double?
 
     struct TrackPointData {
         let timestamp: Date
@@ -46,45 +51,82 @@ final class WorkoutRecorder {
         elevationGain = 0
         trackPoints = []
         sensorSamples = []
+        lastAltitude = nil
         startTimer()
+        startAutoSave()
     }
 
     func pause() {
         guard state == .recording else { return }
         state = .paused
         stopTimer()
+        stopAutoSave()
     }
 
     func resume() {
         guard state == .paused else { return }
         state = .recording
         startTimer()
+        startAutoSave()
     }
 
     func stop() {
         state = .completed
         stopTimer()
+        stopAutoSave()
         hasIncompleteWorkout = false
+        UserDefaults.standard.set(false, forKey: "hasIncompleteWorkout")
     }
 
     func addTrackPoint(_ point: TrackPointData) {
         guard state == .recording else { return }
+
+        // Filter out jitter - require minimum 2m movement or 3 seconds between points
         if let last = trackPoints.last {
-            let delta = calculateDistance(lat1: last.latitude, lon1: last.longitude,
-                                         lat2: point.latitude, lon2: point.longitude)
+            let timeDelta = point.timestamp.timeIntervalSince(last.timestamp)
+            let distDelta = calculateDistance(
+                lat1: last.latitude, lon1: last.longitude,
+                lat2: point.latitude, lon2: point.longitude
+            )
+            if timeDelta < 3.0 && distDelta < 2.0 { return }
+        }
+
+        if let last = trackPoints.last {
+            let delta = calculateDistance(
+                lat1: last.latitude, lon1: last.longitude,
+                lat2: point.latitude, lon2: point.longitude
+            )
             distance += delta
         }
-        if let alt = point.altitude, let lastAlt = trackPoints.last?.altitude {
-            let delta = alt - lastAlt
-            if delta > 0 { elevationGain += delta }
+
+        if let alt = point.altitude {
+            if let prevAlt = lastAltitude {
+                let delta = alt - prevAlt
+                if delta > 1.0 { elevationGain += delta }
+            }
+            lastAltitude = alt
         }
+
         trackPoints.append(point)
+        lastLocationTimestamp = point.timestamp
     }
 
     func addHeartRate(_ value: Double) {
         guard state == .recording else { return }
+        currentHeartRate = Int(value)
         sensorSamples.append(SensorSampleData(timestamp: Date(), value: value, unit: "bpm"))
         calories = calculateCalories(hr: value)
+    }
+
+    func updateFromLocation(_ location: CLLocation) {
+        let point = TrackPointData(
+            timestamp: location.timestamp,
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude,
+            altitude: location.altitude,
+            speed: location.speed >= 0 ? location.speed : nil
+        )
+        addTrackPoint(point)
     }
 
     // MARK: - Private
@@ -100,8 +142,24 @@ final class WorkoutRecorder {
         timer = nil
     }
 
+    private func startAutoSave() {
+        autoSaveTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            self?.persistIncompleteWorkout()
+        }
+    }
+
+    private func stopAutoSave() {
+        autoSaveTimer?.invalidate()
+        autoSaveTimer = nil
+    }
+
+    private func persistIncompleteWorkout() {
+        UserDefaults.standard.set(true, forKey: "hasIncompleteWorkout")
+        UserDefaults.standard.set(elapsedSeconds, forKey: "incompleteDuration")
+        UserDefaults.standard.set(distance, forKey: "incompleteDistance")
+    }
+
     private func checkForIncompleteWorkout() {
-        // Check UserDefaults or disk for persisted incomplete workout state
         hasIncompleteWorkout = UserDefaults.standard.bool(forKey: "hasIncompleteWorkout")
     }
 
@@ -117,8 +175,9 @@ final class WorkoutRecorder {
     }
 
     private func calculateCalories(hr: Double) -> Double {
-        // Simplified calorie estimate based on heart rate and duration
         let minutes = elapsedSeconds / 60.0
-        return (hr * minutes * 0.001) // placeholder formula
+        // Rough estimate: calories ≈ (HR × duration_in_min × 0.001)
+        // More accurate would use user weight and HR zones
+        return hr * minutes * 0.001
     }
 }

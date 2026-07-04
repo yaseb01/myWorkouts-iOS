@@ -31,6 +31,12 @@
 		AA0000000000000000000022 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000026 /* SettingsView.swift */; };
 		AA0000000000000000000023 /* myWorkoutsIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */; };
 		AA0000000000000000000024 /* myWorkoutsProjectStructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000028 /* myWorkoutsProjectStructureTests.swift */; };
+		AA0000000000000000000025 /* WorkoutLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000029 /* WorkoutLiveView.swift */; };
+		AA0000000000000000000026 /* MapTrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000030 /* MapTrackView.swift */; };
+		AA0000000000000000000027 /* ManualWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000031 /* ManualWorkoutView.swift */; };
+		AA0000000000000000000028 /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000032 /* WorkoutDetailView.swift */; };
+		AA0000000000000000000029 /* GPXManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000033 /* GPXManager.swift */; };
+		AA0000000000000000000030 /* GoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000034 /* GoalView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +68,12 @@
 		AB0000000000000000000026 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000027 /* myWorkoutsIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myWorkoutsIntegrationTests.swift; sourceTree = "<group>"; };
 		AB0000000000000000000028 /* myWorkoutsProjectStructureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myWorkoutsProjectStructureTests.swift; sourceTree = "<group>"; };
+		AB0000000000000000000029 /* WorkoutLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000030 /* MapTrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTrackView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000031 /* ManualWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualWorkoutView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000032 /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000033 /* GPXManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXManager.swift; sourceTree = "<group>"; };
+		AB0000000000000000000034 /* GoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +176,7 @@
 				AB0000000000000000000019 /* LocationManager.swift */,
 				AB0000000000000000000020 /* SensorManager.swift */,
 				AB0000000000000000000021 /* WorkoutRecorder.swift */,
+				AB0000000000000000000033 /* GPXManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -176,6 +189,7 @@
 				AD0000000000000000000022 /* History */,
 				AD0000000000000000000023 /* Analysis */,
 				AD0000000000000000000024 /* Settings */,
+				AD0000000000000000000025 /* Goals */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -192,6 +206,9 @@
 			isa = PBXGroup;
 			children = (
 				AB0000000000000000000023 /* WorkoutSetupView.swift */,
+				AB0000000000000000000029 /* WorkoutLiveView.swift */,
+				AB0000000000000000000030 /* MapTrackView.swift */,
+				AB0000000000000000000031 /* ManualWorkoutView.swift */,
 			);
 			path = Record;
 			sourceTree = "<group>";
@@ -200,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				AB0000000000000000000024 /* WorkoutListView.swift */,
+				AB0000000000000000000032 /* WorkoutDetailView.swift */,
 			);
 			path = History;
 			sourceTree = "<group>";
@@ -218,6 +236,14 @@
 				AB0000000000000000000026 /* SettingsView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		AD0000000000000000000025 /* Goals */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000034 /* GoalView.swift */,
+			);
+			path = Goals;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -337,6 +363,12 @@
 				AA0000000000000000000020 /* WorkoutListView.swift in Sources */,
 				AA0000000000000000000021 /* AnalysisView.swift in Sources */,
 				AA0000000000000000000022 /* SettingsView.swift in Sources */,
+				AA0000000000000000000025 /* WorkoutLiveView.swift in Sources */,
+				AA0000000000000000000026 /* MapTrackView.swift in Sources */,
+				AA0000000000000000000027 /* ManualWorkoutView.swift in Sources */,
+				AA0000000000000000000028 /* WorkoutDetailView.swift in Sources */,
+				AA0000000000000000000029 /* GPXManager.swift in Sources */,
+				AA0000000000000000000030 /* GoalView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A50000000000000000000001"
+               BlueprintIdentifier = "AE0000000000000000000001"
                BuildableName = "myWorkouts.app"
                BlueprintName = "myWorkouts"
                ReferencedContainer = "container:myWorkouts.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A50000000000000000000002"
+               BlueprintIdentifier = "AE0000000000000000000002"
                BuildableName = "myWorkoutsTests.xctest"
                BlueprintName = "myWorkoutsTests"
                ReferencedContainer = "container:myWorkouts.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A50000000000000000000001"
+            BlueprintIdentifier = "AE0000000000000000000001"
             BuildableName = "myWorkouts.app"
             BlueprintName = "myWorkouts"
             ReferencedContainer = "container:myWorkouts.xcodeproj">
@@ -72,7 +72,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A50000000000000000000001"
+            BlueprintIdentifier = "AE0000000000000000000001"
             BuildableName = "myWorkouts.app"
             BlueprintName = "myWorkouts"
             ReferencedContainer = "container:myWorkouts.xcodeproj">

@@ -78,6 +78,8 @@ Build: `xcodebuild test -project myWorkouts.xcodeproj -scheme myWorkouts -destin
 - [lesson] Project structure ended up at root `Sources/` rather than `myWorkouts/Sources/` — Xcode project structure diverges from plan's folder hierarchy, but tests verify all expected paths exist.
 - [lesson] WorkoutRecorder's calorie calculation is a placeholder formula (HR × minutes × 0.001) — real implementation would use MET values and user bio data, but sufficient for initial delivery.
 - [lesson] Crash recovery detection exists but is simplified to UserDefaults flag — full persistence of incomplete workout state deferred to a follow-up iteration.
+- [lesson] Iteration 4 verified all 37 tests pass with clean build — confirms full feature set is structurally sound: all models registered, services initialize correctly, tab bar has correct identifiers and accessibility labels, and Info.plist contains required permission keys.
+- [lesson] Iteration 5 final verification: 37/37 tests pass, build clean. All 5 test suites green across app entry, permissions, integration, project structure, and tab bar. Feature is delivered and ready for compose:merge.
 
 ## Source Materials
 

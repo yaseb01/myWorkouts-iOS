@@ -6,11 +6,29 @@ struct myWorkoutsApp: App {
     @State private var locationManager = LocationManager()
     @State private var sensorManager = SensorManager()
     @State private var workoutRecorder = WorkoutRecorder()
+    @State private var modelContainer: ModelContainer?
 
-    var errorMessage: String?
-    var showErrorAlert = false
+    var body: some Scene {
+        WindowGroup {
+            Group {
+                if let container = modelContainer {
+                    ContentView()
+                        .environment(locationManager)
+                        .environment(sensorManager)
+                        .environment(workoutRecorder)
+                        .modelContainer(container)
+                        .onAppear {
+                            seedDefaultDataIfNeeded(context: container.mainContext)
+                        }
+                } else {
+                    ProgressView()
+                        .onAppear { setupContainer() }
+                }
+            }
+        }
+    }
 
-    private let _modelContainer: ModelContainer = {
+    private func setupContainer() {
         let schema = Schema([
             Workout.self,
             TrackPoint.self,
@@ -20,64 +38,80 @@ struct myWorkoutsApp: App {
             HeartRateZone.self,
             UserProfile.self
         ])
+
         let config = ModelConfiguration(isStoredInMemoryOnly: false)
+
         do {
-            return try ModelContainer(for: schema, configurations: config)
+            modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
+            // Schema changed - delete old database and retry
+            deleteOldDatabase()
+            do {
+                modelContainer = try ModelContainer(for: schema, configurations: config)
+            } catch {
+                fatalError("Failed to create ModelContainer: \(error)")
+            }
         }
-    }()
-
-    var modelContainer: ModelContainer { _modelContainer }
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(locationManager)
-                .environment(sensorManager)
-                .environment(workoutRecorder)
-                .onAppear {
-                    seedDefaultDataIfNeeded()
-                }
-        }
-        .modelContainer(modelContainer)
     }
 
-    private func seedDefaultDataIfNeeded() {
-        guard let context = try? modelContainer.mainContext else { return }
+    private func deleteOldDatabase() {
+        guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
+        let fm = FileManager.default
+        // SwiftData default store name
+        let storeURL = url.appendingPathComponent("default.store")
+        try? fm.removeItem(at: storeURL)
+        try? fm.removeItem(at: URL(fileURLWithPath: storeURL.path + "-wal"))
+        try? fm.removeItem(at: URL(fileURLWithPath: storeURL.path + "-shm"))
+        // Also try the app name
+        let appStoreURL = url.appendingPathComponent("myWorkouts.store")
+        try? fm.removeItem(at: appStoreURL)
+        try? fm.removeItem(at: URL(fileURLWithPath: appStoreURL.path + "-wal"))
+        try? fm.removeItem(at: URL(fileURLWithPath: appStoreURL.path + "-shm"))
+    }
 
+    private func seedDefaultDataIfNeeded(context: ModelContext) {
         let descriptor = FetchDescriptor<SportType>()
         let count = (try? context.fetchCount(descriptor)) ?? 0
         guard count == 0 else { return }
 
-        let defaults: [(String, String, String, Bool)] = [
+        let sportDefaults: [(String, String, String, Bool)] = [
+            ("Cycling", "CYC", "#007AFF", true),
+            ("Elliptical Trainer", "ELT", "#00C7BE", false),
+            ("Fitness Training", "FIT", "#34C759", true),
+            ("Flying", "FLY", "#FF9500", false),
+            ("Gymnastics", "GYM", "#007AFF", false),
+            ("Hiking", "HKG", "#8BC34A", false),
+            ("Horse Riding", "RID", "#34C759", false),
+            ("Indoor Cycling", "IC", "#8E8E93", true),
             ("Running", "RUN", "#FF3B30", true),
-            ("Cycling", "CYC", "#007AFF", false),
-            ("Hiking", "HIK", "#34C759", false),
-            ("Walking", "WLK", "#FF9500", false),
             ("Swimming", "SWM", "#5856D6", false),
+            ("Walking", "WLK", "#FF9500", false),
         ]
 
-        for (name, abbr, color, fav) in defaults {
+        for (name, abbr, color, fav) in sportDefaults {
             let sport = SportType(name: name, abbreviation: abbr, color: color, isFavorite: fav)
             context.insert(sport)
         }
 
-        let defaultZones: [(String, Int, Int, Int)] = [
-            ("Recovery", 95, 114, 1),
-            ("Aerobic", 114, 133, 2),
-            ("Tempo", 133, 152, 3),
-            ("Threshold", 152, 171, 4),
-            ("VO2 Max", 171, 190, 5),
+        let zoneDefaults: [(String, String, Int, Int, Int, Double, Double)] = [
+            ("Resting", "Resting (no workout)", 58, 122, 0, 0, 50),
+            ("Easy", "Easy / Recovery", 122, 134, 1, 50, 60),
+            ("Basic Endurance", "Basic Endurance, Fat Burning", 134, 147, 2, 60, 70),
+            ("Tempo", "Tempo, Aerobic Fitness", 147, 160, 3, 70, 80),
+            ("Threshold", "Hard, Anaerobic Zone", 160, 172, 4, 80, 90),
+            ("Maximum", "Maximum Performance / Speed", 172, 185, 5, 90, 100),
         ]
 
-        for (name, min, max, num) in defaultZones {
-            let zone = HeartRateZone(name: name, minHR: min, maxHR: max, zoneNumber: num)
+        for (name, desc, min, max, num, minPct, maxPct) in zoneDefaults {
+            let zone = HeartRateZone(
+                name: name, zoneDescription: desc,
+                minHR: min, maxHR: max, zoneNumber: num,
+                minPercentage: minPct, maxPercentage: maxPct
+            )
             context.insert(zone)
         }
 
-        let profile = UserProfile()
-        context.insert(profile)
+        context.insert(UserProfile())
 
         try? context.save()
     }

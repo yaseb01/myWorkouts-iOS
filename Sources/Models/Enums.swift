@@ -16,6 +16,36 @@ enum IntensityLevel: Int, Codable, CaseIterable {
         case .maximum: return "Maximum"
         }
     }
+
+    var abbreviation: String {
+        switch self {
+        case .easy: return "G1"
+        case .moderate: return "G2"
+        case .hard: return "G3"
+        case .veryHard: return "G4"
+        case .maximum: return "G5"
+        }
+    }
+
+    var minHR: Int {
+        switch self {
+        case .easy: return 95
+        case .moderate: return 114
+        case .hard: return 133
+        case .veryHard: return 152
+        case .maximum: return 171
+        }
+    }
+
+    var maxHR: Int {
+        switch self {
+        case .easy: return 114
+        case .moderate: return 133
+        case .hard: return 152
+        case .veryHard: return 171
+        case .maximum: return 190
+        }
+    }
 }
 
 enum SensorType: String, Codable, CaseIterable {
