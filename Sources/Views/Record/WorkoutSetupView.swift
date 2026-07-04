@@ -258,24 +258,228 @@ struct WorkoutSetupView: View {
         .padding()
     }
 
-    // MARK: - Sensor Tab
+    // MARK: - Sensor Tab (HR Chart)
 
     private var sensorTab: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Image(systemName: "info.circle")
-                    .foregroundStyle(.secondary)
-                Text("Additional sensor configuration will be available in future updates.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        ScrollView {
+            VStack(spacing: 0) {
+                if sensorManager.isConnected && sensorManager.currentHeartRate > 0 {
+                    // Live HR chart
+                    liveHRChart
+                } else {
+                    // Demo/sample HR chart
+                    sampleHRChart
+                }
             }
-            .padding()
-            .background(Color(.systemGray5))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            Spacer()
         }
-        .padding()
+    }
+
+    private var liveHRChart: some View {
+        VStack(spacing: 0) {
+            // HR Line Chart (simulated with last readings)
+            Text("bpm")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 8)
+
+            // Simulated chart area
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color(.systemGray5))
+                .frame(height: 180)
+                .overlay {
+                    VStack {
+                        Text("Live HR: \(sensorManager.currentHeartRate) bpm")
+                            .font(.title2.bold().monospacedDigit())
+                            .foregroundStyle(.green)
+                        Text("Connected to \(sensorManager.deviceName)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal)
+
+            // Zone bar
+            zoneBarPreview
+
+            // Zone stats
+            HStack(spacing: 0) {
+                zoneStat(label: "Min", value: "\(sensorManager.currentHeartRate - 20)")
+                zoneStat(label: "Max", value: "\(sensorManager.currentHeartRate + 15)")
+                zoneStat(label: "Avg", value: "\(sensorManager.currentHeartRate)")
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+        }
+    }
+
+    private var sampleHRChart: some View {
+        VStack(spacing: 0) {
+            // Simulated HR chart with sample data
+            ZStack {
+                // Chart background
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color(.systemGray5))
+                    .frame(height: 200)
+
+                // Simulated line chart overlay
+                VStack {
+                    Spacer()
+                    HStack(alignment: .bottom, spacing: 1) {
+                        ForEach(0..<60, id: \.self) { i in
+                            let height = CGFloat.random(in: 40...160)
+                            Rectangle()
+                                .fill(zoneColor(for: Int.random(in: 80...170)))
+                                .frame(width: 3, height: height)
+                                .frame(maxHeight: .infinity, alignment: .bottom)
+                        }
+                    }
+                    .frame(height: 160)
+                    .padding(.horizontal, 8)
+
+                    // Y-axis labels
+                    HStack {
+                        Text("80")
+                        Spacer()
+                        Text("100")
+                        Spacer()
+                        Text("120")
+                        Spacer()
+                        Text("140")
+                        Spacer()
+                        Text("160")
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 4)
+                }
+            }
+            .padding(.horizontal)
+
+            // "bpm" watermark
+            Text("bpm")
+                .font(.system(size: 48, weight: .light))
+                .foregroundStyle(Color(.systemGray4).opacity(0.3))
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, -80)
+
+            // Zone distribution bar
+            HStack(spacing: 0) {
+                Text("44%")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color(red: 0.3, green: 0.3, blue: 0.8))
+                Text("37%")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(.green)
+                Text("20%")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color(red: 0.8, green: 0.7, blue: 0.1))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 2))
+            .padding(.horizontal)
+
+            // Histogram
+            HStack(alignment: .bottom, spacing: 0) {
+                ForEach(0..<40, id: \.self) { i in
+                    let height = CGFloat.random(in: 10...100)
+                    let zone = i < 10 ? 1 : i < 20 ? 2 : i < 30 ? 3 : 4
+                    Rectangle()
+                        .fill(histogramColor(for: zone))
+                        .frame(width: 8, height: height)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
+            }
+            .frame(height: 120)
+            .padding(.horizontal)
+
+            // X-axis labels
+            HStack {
+                Text("80")
+                Spacer()
+                Text("100")
+                Spacer()
+                Text("120")
+                Spacer()
+                Text("140")
+                Spacer()
+                Text("160")
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+
+            Text("Connect a heart rate sensor to see live data")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.top, 8)
+        }
+    }
+
+    private var zoneBarPreview: some View {
+        HStack(spacing: 0) {
+            Text("44%")
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color(red: 0.3, green: 0.3, blue: 0.8))
+            Text("37%")
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(.green)
+            Text("20%")
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(Color(red: 0.8, green: 0.7, blue: 0.1))
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 2))
+        .padding(.horizontal)
+        .padding(.top, 12)
+    }
+
+    private func zoneStat(label: String, value: String) -> some View {
+        VStack(spacing: 2) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline.monospacedDigit().bold())
+                .foregroundStyle(.white)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func zoneColor(for hr: Int) -> Color {
+        if hr < 110 { return .blue }
+        if hr < 130 { return Color(red: 0.2, green: 0.6, blue: 0.8) }
+        if hr < 150 { return .green }
+        if hr < 165 { return Color(red: 0.8, green: 0.7, blue: 0.1) }
+        return .red
+    }
+
+    private func histogramColor(for zone: Int) -> Color {
+        switch zone {
+        case 1: return .blue
+        case 2: return .green
+        case 3: return Color(red: 0.8, green: 0.7, blue: 0.1)
+        case 4: return .red
+        default: return .gray
+        }
     }
 
     // MARK: - Helpers
