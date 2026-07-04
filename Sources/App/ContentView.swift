@@ -96,5 +96,6 @@ struct ContentView: View {
             .accessibilityLabel("Settings tab")
         }
         .accessibilityElement(children: .contain)
+        .preferredColorScheme(.dark)
     }
 }
