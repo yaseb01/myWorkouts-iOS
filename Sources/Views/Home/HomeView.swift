@@ -140,26 +140,30 @@ struct HomeView: View {
         let stats = periodStats  // [Goal, 7 Days, 30 Days, 1 Year]
 
         return VStack(alignment: .leading, spacing: 0) {
+            // Section title
             Text("STATISTICS OVERVIEW")
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
-                .padding(.bottom, 8)
+                .padding(.bottom, 10)
 
-            // Column headers
-            HStack(spacing: 0) {
-                Color.clear.frame(width: 72)
+            // Horizontal labels (column headers)
+            HStack(spacing: 4) {
+                // Empty space for row label column
+                Color.clear.frame(width: 68)
+                // Column headers
                 ForEach(Array(statHeaders.enumerated()), id: \.offset) { index, header in
                     Text(header)
-                        .font(.caption2)
+                        .font(.caption2.bold())
                         .multilineTextAlignment(.center)
+                        .lineLimit(2)
                         .foregroundStyle(index == 0 ? .green : .white)
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, 6)
 
-            // Stat rows
-            VStack(spacing: 2) {
+            // Data rows with vertical labels
+            VStack(spacing: 3) {
                 statRow(label: "Count", values: stats.map { $0.count }, goalValue: stats[0].count, mode: displayMode)
                 statRow(label: "Duration", values: stats.map { $0.duration }, goalValue: stats[0].duration, mode: displayMode)
                 statRow(label: "Calories", values: stats.map { $0.calories }, goalValue: stats[0].calories, mode: displayMode)
@@ -176,16 +180,16 @@ struct HomeView: View {
                     }
                 } label: {
                     Text(displayMode == .percentage ? "RELATIVE TO REFERENCE" : "ABSOLUTE VALUES")
-                        .font(.caption.bold())
+                        .font(.subheadline.bold())
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 12)
                         .background(Color(.systemGray4))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
                 Spacer()
             }
-            .padding(.top, 10)
+            .padding(.top, 12)
         }
     }
 
@@ -194,21 +198,23 @@ struct HomeView: View {
     }
 
     private func statRow(label: String, values: [Double], goalValue: Double, mode: DisplayMode) -> some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 4) {
+            // Vertical label (row label)
             Text(label)
-                .font(.caption)
+                .font(.caption.bold())
                 .foregroundStyle(.white)
-                .frame(width: 72, alignment: .leading)
+                .frame(width: 68, alignment: .leading)
 
+            // Data cells
             ForEach(Array(values.enumerated()), id: \.offset) { index, value in
                 let result = cellContent(label: label, value: value, goalValue: goalValue, index: index, mode: mode)
                 Text(result.text)
                     .font(.caption.monospacedDigit().bold())
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 7)
                     .background(result.color)
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                    .clipShape(RoundedRectangle(cornerRadius: 3))
             }
         }
     }
