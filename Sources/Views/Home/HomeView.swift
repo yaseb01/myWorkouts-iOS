@@ -10,7 +10,6 @@ struct HomeView: View {
 
     enum DisplayMode {
         case absolute
-        case perWeek
         case percentage
     }
 
@@ -138,12 +137,10 @@ struct HomeView: View {
     // MARK: - Statistics
 
     private var statisticsSection: some View {
-        let refIndex = 2  // "1 Jahr" is the reference column (index 2)
-        let stats = periodStats
-        let ref = stats[refIndex]
+        let stats = periodStats  // [Goal, 7 Days, 30 Days, 1 Year]
 
         return VStack(alignment: .leading, spacing: 0) {
-            Text("STATISTICS (OVERVIEW)")
+            Text("STATISTICS OVERVIEW")
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
@@ -152,10 +149,10 @@ struct HomeView: View {
             // Column headers
             HStack(spacing: 0) {
                 Color.clear.frame(width: 80)
-                ForEach(Array(periodHeaders.enumerated()), id: \.offset) { index, header in
+                ForEach(Array(statHeaders.enumerated()), id: \.offset) { index, header in
                     Text(header)
                         .font(.caption2)
-                        .foregroundStyle(index == refIndex ? .green : .white)
+                        .foregroundStyle(index == 0 ? .green : .white)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -164,11 +161,11 @@ struct HomeView: View {
 
             // Stat rows
             VStack(spacing: 2) {
-                statRow(label: "Workouts", values: stats.map { $0.count }, ref: ref.count, mode: displayMode)
-                statRow(label: "Duration", values: stats.map { $0.duration }, ref: ref.duration, mode: displayMode)
-                statRow(label: "Calories", values: stats.map { $0.calories }, ref: ref.calories, mode: displayMode)
-                statRow(label: "Distance", values: stats.map { $0.distance }, ref: ref.distance, mode: displayMode)
-                statRow(label: "Incline", values: stats.map { $0.elevation }, ref: ref.elevation, mode: displayMode)
+                statRow(label: "Count", values: stats.map { $0.count }, goalValue: stats[0].count, mode: displayMode)
+                statRow(label: "Duration", values: stats.map { $0.duration }, goalValue: stats[0].duration, mode: displayMode)
+                statRow(label: "Calories", values: stats.map { $0.calories }, goalValue: stats[0].calories, mode: displayMode)
+                statRow(label: "Distance", values: stats.map { $0.distance }, goalValue: stats[0].distance, mode: displayMode)
+                statRow(label: "Incline", values: stats.map { $0.elevation }, goalValue: stats[0].elevation, mode: displayMode)
             }
             .padding(.horizontal)
 
@@ -177,14 +174,10 @@ struct HomeView: View {
                 Spacer()
                 Button {
                     withAnimation {
-                        switch displayMode {
-                        case .percentage: displayMode = .absolute
-                        case .absolute: displayMode = .perWeek
-                        case .perWeek: displayMode = .percentage
-                        }
+                        displayMode = displayMode == .percentage ? .absolute : .percentage
                     }
                 } label: {
-                    Text(buttonLabel)
+                    Text(displayMode == .percentage ? "RELATIVE TO REFERENCE" : "ABSOLUTE VALUES")
                         .font(.caption.bold())
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
@@ -199,15 +192,11 @@ struct HomeView: View {
         .padding(.vertical, 8)
     }
 
-    private var buttonLabel: String {
-        switch displayMode {
-        case .percentage: return "PERCENTAGE COMPARE"
-        case .absolute: return "ABSOLUTE NUMBERS"
-        case .perWeek: return "PER WEEK"
-        }
+    private var statHeaders: [String] {
+        ["Goal", "Last\n7 Days", "Last\n30 Days", "Last\nYear"]
     }
 
-    private func statRow(label: String, values: [Double], ref: Double, mode: DisplayMode) -> some View {
+    private func statRow(label: String, values: [Double], goalValue: Double, mode: DisplayMode) -> some View {
         HStack(spacing: 0) {
             Text(label)
                 .font(.caption)
@@ -215,7 +204,7 @@ struct HomeView: View {
                 .frame(width: 80, alignment: .leading)
 
             ForEach(Array(values.enumerated()), id: \.offset) { index, value in
-                let result = cellContent(label: label, value: value, ref: ref, index: index, mode: mode)
+                let result = cellContent(label: label, value: value, goalValue: goalValue, index: index, mode: mode)
                 Text(result.text)
                     .font(.caption.monospacedDigit().bold())
                     .foregroundStyle(.white)
@@ -227,53 +216,67 @@ struct HomeView: View {
         }
     }
 
-    private func cellContent(label: String, value: Double, ref: Double, index: Int, mode: DisplayMode) -> (text: String, color: Color) {
+    private func cellContent(label: String, value: Double, goalValue: Double, index: Int, mode: DisplayMode) -> (text: String, color: Color) {
+        // Goal column (index 0)
+        if index == 0 {
+            if mode == .percentage {
+                return ("100%", .green)
+            } else {
+                return (goalAbsoluteText(label: label, value: value), .green)
+            }
+        }
+
+        // Period columns
+        if value == 0 && mode == .percentage {
+            return ("--", Color(.systemGray4))
+        }
+
         switch mode {
         case .percentage:
-            let pct = ref > 0 ? (value / ref * 100) : 0
+            let pct = goalValue > 0 ? (value / goalValue * 100) : 0
             return ("\(Int(pct))%", percentageColor(pct))
         case .absolute:
-            let text: String
-            if label == "Workouts" {
-                text = "\(Int(value))"
-            } else if label == "Duration" {
-                text = formatDurationShort(value)
-            } else if label == "Distance" {
-                text = String(format: "%.0f", value / 1000)
-            } else {
-                text = "\(Int(value))"
-            }
-            return (text, periodColors[index])
-        case .perWeek:
-            let perWeek = value / 7.0
-            let text: String
-            if label == "Workouts" {
-                text = String(format: "%.1f", perWeek)
-            } else if label == "Duration" {
-                text = formatDurationShort(perWeek * 60)
-            } else if label == "Distance" {
-                text = String(format: "%.1f", perWeek / 1000)
-            } else {
-                text = "\(Int(perWeek))"
-            }
-            return (text, periodColors[index])
+            return (absoluteText(label: label, value: value), periodColors[index])
+        }
+    }
+
+    private func goalAbsoluteText(label: String, value: Double) -> String {
+        switch label {
+        case "Count": return "\(Int(value))"
+        case "Duration": return formatDurationShort(value)
+        case "Calories": return "\(Int(value))'"
+        case "Distance": return String(format: "%.0f", value)
+        case "Incline": return "--"
+        default: return "\(Int(value))"
+        }
+    }
+
+    private func absoluteText(label: String, value: Double) -> String {
+        switch label {
+        case "Count": return "\(Int(value))"
+        case "Duration": return formatDurationShort(value)
+        case "Calories": return "\(Int(value))"
+        case "Distance": return String(format: "%.0f", value)
+        case "Incline": return value > 0 ? "\(Int(value))" : "--"
+        default: return "\(Int(value))"
         }
     }
 
     private func percentageColor(_ pct: Double) -> Color {
-        if pct < 30 { return .blue }
-        if pct < 70 { return Color(red: 0.2, green: 0.6, blue: 1.0) }
-        if pct < 95 { return Color(red: 0.3, green: 0.7, blue: 0.3) }
-        if pct <= 105 { return .green }
-        if pct <= 130 { return Color(red: 0.6, green: 0.8, blue: 0.2) }
-        return Color(red: 0.9, green: 0.7, blue: 0.1)
+        if pct < 25 { return .blue }
+        if pct < 50 { return Color(red: 0.2, green: 0.5, blue: 1.0) }
+        if pct < 80 { return Color(red: 0.3, green: 0.7, blue: 0.4) }
+        if pct <= 110 { return .green }
+        if pct <= 140 { return Color(red: 0.8, green: 0.7, blue: 0.1) }
+        if pct <= 170 { return Color(red: 0.9, green: 0.5, blue: 0.1) }
+        return Color(red: 0.9, green: 0.2, blue: 0.1)
     }
 
     private let periodColors: [Color] = [
-        .blue,
-        Color(red: 0.2, green: 0.7, blue: 0.4),
         .green,
-        Color(red: 0.1, green: 0.6, blue: 0.8)
+        Color(red: 0.9, green: 0.6, blue: 0.1),
+        Color(red: 0.9, green: 0.4, blue: 0.1),
+        Color(red: 0.9, green: 0.2, blue: 0.1)
     ]
 
     // MARK: - Goals
@@ -329,22 +332,30 @@ struct HomeView: View {
         let elevation: Double
     }
 
-    private var periodHeaders: [String] {
-        ["7 Days", "30 Days", "1 Year", "Total"]
-    }
-
     private var periodStats: [PeriodStat] {
         let now = Date()
-        let periods: [Int?] = [7, 30, 365, nil]
 
-        return periods.map { days in
-            let filtered: [Workout]
-            if let d = days {
-                let start = Calendar.current.date(byAdding: .day, value: -d, to: now)!
-                filtered = allWorkouts.filter { $0.startTime >= start }
-            } else {
-                filtered = allWorkouts
-            }
+        // Goal values (weekly targets from active goals)
+        let weekWorkouts = thisWeekWorkouts
+        let goalCount = activeGoals.first(where: { $0.type == .workouts })?.weeklyTarget ?? 3
+        let goalDuration = (activeGoals.first(where: { $0.type == .duration })?.weeklyTarget ?? 150) * 60 // minutes to seconds
+        let goalCalories = activeGoals.first(where: { $0.type == .calories })?.weeklyTarget ?? 2000
+        let goalDistance = (activeGoals.first(where: { $0.type == .distance })?.weeklyTarget ?? 20) * 1000 // km to meters
+        let goalElevation = activeGoals.first(where: { $0.type == .elevation })?.weeklyTarget ?? 500
+
+        let goal = PeriodStat(
+            count: goalCount,
+            duration: goalDuration,
+            calories: goalCalories,
+            distance: goalDistance,
+            elevation: goalElevation
+        )
+
+        // Period stats
+        let periods: [Int] = [7, 30, 365]
+        let periodStats = periods.map { days in
+            let start = Calendar.current.date(byAdding: .day, value: -days, to: now)!
+            let filtered = allWorkouts.filter { $0.startTime >= start }
             return PeriodStat(
                 count: Double(filtered.count),
                 duration: filtered.reduce(0) { $0 + $1.duration },
@@ -353,6 +364,8 @@ struct HomeView: View {
                 elevation: filtered.reduce(0) { $0 + $1.elevationGain }
             )
         }
+
+        return [goal] + periodStats
     }
 
     private var thisWeekWorkouts: [Workout] {
