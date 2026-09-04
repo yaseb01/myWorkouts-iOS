@@ -135,7 +135,7 @@ struct WorkoutDetailView: View {
                     }
 
                     HStack(spacing: 0) {
-                        factColumn(label: "Detail.TargetZone".localized(), value: "\(workout.intensity.minHR)..\(workout.intensity.maxHR)", unit: "Timer.bpm".localized())
+                        factColumn(label: "Detail.TargetZone".localized(), value: "\(workout.effectiveMinHR)..\(workout.effectiveMaxHR)", unit: "Timer.bpm".localized())
                         factColumn(label: "Detail.TimeInZone".localized(), value: timeInZone, unit: "")
                         factColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgHR))", unit: "Timer.bpm".localized())
                     }
@@ -283,47 +283,40 @@ struct WorkoutDetailView: View {
                 if !heartRateSamples.isEmpty {
                     // HR Stats
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("HEART RATE")
+                        Text("Detail.HeartRate".localized())
                             .font(.caption.bold())
                             .foregroundStyle(.secondary)
 
                         HStack(spacing: 0) {
-                            factColumn(label: "Min", value: "\(Int(minHR))", unit: "bpm")
-                            factColumn(label: "Max", value: "\(Int(maxHR))", unit: "bpm")
-                            factColumn(label: "Avg", value: "\(Int(avgHR))", unit: "bpm ø")
+                            factColumn(label: "HR.Min".localized(), value: "\(Int(minHR))", unit: "Timer.bpm".localized())
+                            factColumn(label: "HR.Max".localized(), value: "\(Int(maxHR))", unit: "Timer.bpm".localized())
+                            factColumn(label: "HR.Avg".localized(), value: "\(Int(avgHR))", unit: "History.BpmAvg".localized())
                         }
 
                         Divider().background(Color.gray.opacity(0.3))
 
                         HStack(spacing: 0) {
-                            factColumn(label: "Target Zone", value: "\(workout.intensity.minHR)..\(workout.intensity.maxHR)", unit: "bpm")
-                            factColumn(label: "Time in zone", value: timeInZone, unit: "")
-                            factColumn(label: "Avg in zone", value: "\(Int(avgHR))", unit: "bpm")
+                            factColumn(label: "Detail.TargetZone".localized(), value: "\(workout.effectiveMinHR)..\(workout.effectiveMaxHR)", unit: "Timer.bpm".localized())
+                            factColumn(label: "Detail.TimeInZone".localized(), value: timeInZone, unit: "")
+                            factColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgHR))", unit: "Timer.bpm".localized())
                         }
                     }
 
                     // Zone bar
                     zoneBar
 
-                    // HR Chart
-                    Chart(heartRateSamples) { sample in
-                        LineMark(
-                            x: .value("Time", sample.timestamp),
-                            y: .value("BPM", sample.value)
-                        )
-                        .foregroundStyle(.green)
-                        .interpolationMethod(.catmullRom)
-                    }
-                    .frame(height: 150)
+                    // HR Chart with zoom
+                    ZoomableHRChart(samples: heartRateSamples)
+                        .frame(height: 200)
 
                     // Histogram
                     hrHistogram
                         .frame(height: 100)
                 } else {
                     ContentUnavailableView(
-                        "No Heart Rate Data",
+                        "HR.NoData".localized(),
                         systemImage: "heart.slash",
-                        description: Text("No heart rate data recorded for this workout.")
+                        description: Text("Detail.NoHeartRateData".localized())
                     )
                 }
             }
@@ -376,9 +369,9 @@ struct WorkoutDetailView: View {
 
     private var zoneBar: some View {
         let total = max(1, heartRateSamples.count)
-        let belowZone = heartRateSamples.filter { Int($0.value) < workout.intensity.minHR }.count
-        let inZone = heartRateSamples.filter { Int($0.value) >= workout.intensity.minHR && Int($0.value) <= workout.intensity.maxHR }.count
-        let aboveZone = heartRateSamples.filter { Int($0.value) > workout.intensity.maxHR }.count
+        let belowZone = heartRateSamples.filter { Int($0.value) < workout.effectiveMinHR }.count
+        let inZone = heartRateSamples.filter { Int($0.value) >= workout.effectiveMinHR && Int($0.value) <= workout.effectiveMaxHR }.count
+        let aboveZone = heartRateSamples.filter { Int($0.value) > workout.effectiveMaxHR }.count
 
         let belowPct = Double(belowZone) / Double(total) * 100
         let inPct = Double(inZone) / Double(total) * 100
@@ -619,5 +612,68 @@ extension Color {
         }
 
         self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
+    }
+}
+
+// MARK: - Zoomable HR Chart
+
+private struct ZoomableHRChart: View {
+    let samples: [SensorSample]
+
+    @State private var xRange: ClosedRange<Date>?
+
+    private var minTime: Date {
+        samples.first?.timestamp ?? Date.distantPast
+    }
+
+    private var maxTime: Date {
+        samples.last?.timestamp ?? Date.distantFuture
+    }
+
+    var body: some View {
+        Chart(samples) { sample in
+            LineMark(
+                x: .value("Time", sample.timestamp),
+                y: .value("BPM", sample.value)
+            )
+            .foregroundStyle(.green)
+            .interpolationMethod(.catmullRom)
+        }
+        .chartXScale(domain: xRange ?? minTime...maxTime)
+        .chartOverlay { proxy in
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                let x = value.location.x
+                                if let date: Date = proxy.value(atX: x) {
+                                    let visibleRange = xRange ?? minTime...maxTime
+                                    let span = visibleRange.upperBound.timeIntervalSince(visibleRange.lowerBound)
+                                    let zoomFactor: Double = 3.0
+
+                                    let newLower = date.addingTimeInterval(-span / 2 / zoomFactor)
+                                    let newUpper = date.addingTimeInterval(span / 2 / zoomFactor)
+
+                                    let clampedLower = max(minTime, newLower)
+                                    let clampedUpper = min(maxTime, newUpper)
+
+                                    xRange = clampedLower...clampedUpper
+                                }
+                            }
+                            .onEnded { _ in
+                                xRange = nil
+                            }
+                    )
+            }
+        }
+        .chartGesture { proxy in
+            DragGesture()
+                .onEnded { _ in
+                    xRange = nil
+                }
+        }
     }
 }

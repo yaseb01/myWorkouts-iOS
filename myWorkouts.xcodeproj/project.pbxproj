@@ -23,6 +23,7 @@
 		AA0000000000000000000014 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000018 /* UserProfile.swift */; };
 		AA0000000000000000000015 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000019 /* LocationManager.swift */; };
 		AA0000000000000000000016 /* SensorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000020 /* SensorManager.swift */; };
+		AA000000000000001 /* GPXImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB000000000000001 /* GPXImportView.swift */; };
 		AA0000000000000000000017 /* WorkoutRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000021 /* WorkoutRecorder.swift */; };
 		AA0000000000000000000018 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000022 /* HomeView.swift */; };
 		AA0000000000000000000019 /* WorkoutSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000023 /* WorkoutSetupView.swift */; };
@@ -71,6 +72,7 @@
 		AB0000000000000000000017 /* HeartRateZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateZone.swift; sourceTree = "<group>"; };
 		AB0000000000000000000018 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		AB0000000000000000000019 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		AB000000000000001 /* GPXImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../Views/History/GPXImportView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000020 /* SensorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManager.swift; sourceTree = "<group>"; };
 		AB0000000000000000000021 /* WorkoutRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecorder.swift; sourceTree = "<group>"; };
 		AB0000000000000000000022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				AB0000000000000000000016 /* SportType.swift */,
 				AB0000000000000000000017 /* HeartRateZone.swift */,
 				AB0000000000000000000018 /* UserProfile.swift */,
+				AB000000000000001 /* GPXImportView.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -372,6 +375,7 @@
 				AA0000000000000000000011 /* Goal.swift in Sources */,
 				AA0000000000000000000012 /* SportType.swift in Sources */,
 				AA0000000000000000000013 /* HeartRateZone.swift in Sources */,
+				AA000000000000001 /* GPXImportView.swift in Sources */,
 				AA0000000000000000000014 /* UserProfile.swift in Sources */,
 				AA0000000000000000000015 /* LocationManager.swift in Sources */,
 				AA0000000000000000000016 /* SensorManager.swift in Sources */,

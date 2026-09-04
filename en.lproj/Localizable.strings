@@ -323,6 +323,8 @@
 "Setup.LiveHR" = "Live HR: %d bpm";
 "Setup.ConnectedTo" = "Connected to %@";
 "Setup.ConnectSensor" = "Connect a heart rate sensor to see live data";
+"Setup.UseCustomHR" = "Use custom heart rate range";
+"Setup.CustomHRRange" = "Set your own min and max HR";
 
 /* Missing Keys - Manual */
 "Manual.Sport" = "Sport";
@@ -363,3 +365,18 @@
 "Home.PerWeek" = "Per Week";
 "Home.RelativeToReference" = "RELATIVE TO REFERENCE";
 "Home.AbsoluteValues" = "ABSOLUTE VALUES";
+
+/* Missing Keys - GPX */
+"GPX.Import" = "Import GPX";
+"GPX.SelectFile" = "Select GPX File";
+"GPX.SelectFileDesc" = "Import a GPX file to create a workout with GPS track";
+"GPX.Browse" = "Browse Files";
+"GPX.TrackInfo" = "Track Information";
+"GPX.Points" = "Track Points";
+"GPX.Distance" = "Distance";
+"GPX.ElevationGain" = "Elevation Gain";
+"GPX.Duration" = "Duration";
+"GPX.Preview" = "Track Preview";
+"GPX.AccessError" = "Could not access the selected file";
+"GPX.ParseError" = "Could not parse GPX file";
+"GPX.SaveError" = "Could not save workout";

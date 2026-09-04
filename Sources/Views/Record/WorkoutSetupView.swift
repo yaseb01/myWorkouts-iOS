@@ -9,6 +9,9 @@ struct WorkoutSetupView: View {
 
     @State private var selectedSportType: SportType?
     @State private var intensity: IntensityLevel = .moderate
+    @State private var useCustomHR = false
+    @State private var customMinHR: Int = 120
+    @State private var customMaxHR: Int = 160
     @State private var useGPS = true
     @State private var useHeartRate = false
     @State private var note: String = ""
@@ -76,6 +79,8 @@ struct WorkoutSetupView: View {
             WorkoutLiveView(
                 sportType: selectedSportType,
                 intensity: intensity,
+                customMinHR: useCustomHR ? customMinHR : nil,
+                customMaxHR: useCustomHR ? customMaxHR : nil,
                 note: note,
                 useGPS: useGPS,
                 useHR: useHeartRate
@@ -124,18 +129,66 @@ struct WorkoutSetupView: View {
                 .background(Color(.systemGray5))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                // Level
-                HStack {
-                    Text("Setup.Level".localized())
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Picker("", selection: $intensity) {
-                        ForEach(IntensityLevel.allCases, id: \.self) { level in
-                            Text("\(level.name) (\(level.rawValue * 20)% - \((level.rawValue + 1) * 20)%)").tag(level)
+                // Intensity Level
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("Setup.Level".localized())
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker("", selection: $intensity) {
+                            ForEach(IntensityLevel.allCases, id: \.self) { level in
+                                Text("\(level.name) (\(level.rawValue * 20)% - \((level.rawValue + 1) * 20)%)").tag(level)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.green)
+                    }
+
+                    Toggle(isOn: $useCustomHR) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Setup.UseCustomHR".localized())
+                                .foregroundStyle(.white)
+                            Text("Setup.CustomHRRange".localized())
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
-                    .pickerStyle(.menu)
                     .tint(.green)
+
+                    if useCustomHR {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("HRZones.MinHR".localized())
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                HStack {
+                                    TextField("", value: $customMinHR, format: .number)
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 70)
+                                    Text("bpm")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            VStack(alignment: .leading) {
+                                Text("HRZones.MaxHR".localized())
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                HStack {
+                                    TextField("", value: $customMaxHR, format: .number)
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 70)
+                                    Text("bpm")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .padding(.top, 8)
+                    }
                 }
                 .padding()
                 .background(Color(.systemGray5))

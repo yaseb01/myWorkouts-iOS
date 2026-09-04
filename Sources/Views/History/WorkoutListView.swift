@@ -8,6 +8,7 @@ struct WorkoutListView: View {
     @State private var searchText = ""
     @State private var selectedSportFilter: String? = nil
     @State private var showManualEntry = false
+    @State private var showGPXImport = false
 
     private var filteredWorkouts: [Workout] {
         var result = workouts
@@ -61,8 +62,18 @@ struct WorkoutListView: View {
         .navigationTitle("History.Title".localized())
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showManualEntry = true
+                Menu {
+                    Button {
+                        showManualEntry = true
+                    } label: {
+                        Label("Manual.ManualEntry".localized(), systemImage: "plus.circle")
+                    }
+
+                    Button {
+                        showGPXImport = true
+                    } label: {
+                        Label("GPX.Import".localized(), systemImage: "square.and.arrow.down")
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .foregroundStyle(.green)
@@ -73,6 +84,9 @@ struct WorkoutListView: View {
             NavigationStack {
                 ManualWorkoutView()
             }
+        }
+        .sheet(isPresented: $showGPXImport) {
+            GPXImportView()
         }
     }
 }

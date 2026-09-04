@@ -323,6 +323,8 @@
 "Setup.LiveHR" = "Live HF: %d bpm";
 "Setup.ConnectedTo" = "Verbunden mit %@";
 "Setup.ConnectSensor" = "Herzfrequenzsensor verbinden, um Live-Daten zu sehen";
+"Setup.UseCustomHR" = "Eigenen HF-Bereich verwenden";
+"Setup.CustomHRRange" = "Eigenen Min- und Max-HF festlegen";
 
 /* Missing Keys - Manual */
 "Manual.Sport" = "Sport";
@@ -363,3 +365,18 @@
 "Home.PerWeek" = "Pro Woche";
 "Home.RelativeToReference" = "RELATIV ZUM REFERENZWERT";
 "Home.AbsoluteValues" = "ABSOLUTE WERTE";
+
+/* Missing Keys - GPX */
+"GPX.Import" = "GPX importieren";
+"GPX.SelectFile" = "GPX-Datei auswählen";
+"GPX.SelectFileDesc" = "Importiere eine GPX-Datei um ein Training mit GPS-Strecke zu erstellen";
+"GPX.Browse" = "Dateien durchsuchen";
+"GPX.TrackInfo" = "Streckeninformationen";
+"GPX.Points" = "Streckenpunkte";
+"GPX.Distance" = "Distanz";
+"GPX.ElevationGain" = "Höhenmeter";
+"GPX.Duration" = "Dauer";
+"GPX.Preview" = "Streckenvorschau";
+"GPX.AccessError" = "Zugriff auf die ausgewählte Datei nicht möglich";
+"GPX.ParseError" = "GPX-Datei konnte nicht gelesen werden";
+"GPX.SaveError" = "Training konnte nicht gespeichert werden";

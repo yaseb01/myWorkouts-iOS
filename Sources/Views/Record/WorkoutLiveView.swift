@@ -13,6 +13,8 @@ struct WorkoutLiveView: View {
 
     let sportType: SportType?
     let intensity: IntensityLevel
+    let customMinHR: Int?
+    let customMaxHR: Int?
     let note: String
     let useGPS: Bool
     let useHR: Bool
@@ -21,6 +23,14 @@ struct WorkoutLiveView: View {
     @State private var showStopConfirmation = false
     @State private var selectedTab = 0
     @State private var showSaveError = false
+
+    var effectiveMinHR: Int {
+        customMinHR ?? intensity.minHR
+    }
+
+    var effectiveMaxHR: Int {
+        customMaxHR ?? intensity.maxHR
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -644,9 +654,9 @@ struct WorkoutLiveView: View {
         let hrSamples = recorder.sensorSamples.filter { $0.unit == "bpm" }
         let total = max(1, hrSamples.count)
 
-        let belowZone = hrSamples.filter { Int($0.value) < intensity.minHR }.count
-        let inZone = hrSamples.filter { Int($0.value) >= intensity.minHR && Int($0.value) <= intensity.maxHR }.count
-        let aboveZone = hrSamples.filter { Int($0.value) > intensity.maxHR }.count
+        let belowZone = hrSamples.filter { Int($0.value) < effectiveMinHR }.count
+        let inZone = hrSamples.filter { Int($0.value) >= effectiveMinHR && Int($0.value) <= effectiveMaxHR }.count
+        let aboveZone = hrSamples.filter { Int($0.value) > effectiveMaxHR }.count
 
         let belowPct = Double(belowZone) / Double(total) * 100
         let inPct = Double(inZone) / Double(total) * 100
@@ -821,6 +831,8 @@ struct WorkoutLiveView: View {
             elevationGain: recorder.elevationGain,
             note: note.isEmpty ? nil : note,
             intensity: intensity,
+            customMinHR: customMinHR,
+            customMaxHR: customMaxHR,
             isManual: false
         )
 
