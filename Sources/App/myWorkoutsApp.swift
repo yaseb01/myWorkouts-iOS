@@ -6,20 +6,26 @@ struct myWorkoutsApp: App {
     @State private var locationManager = LocationManager()
     @State private var sensorManager = SensorManager()
     @State private var workoutRecorder = WorkoutRecorder()
-    @State private var modelContainer: ModelContainer?
+    @State var modelContainer: ModelContainer?
+
+    init() {
+        _ = AppLanguageManager.shared
+    }
 
     var body: some Scene {
         WindowGroup {
             Group {
                 if let container = modelContainer {
-                    ContentView()
-                        .environment(locationManager)
-                        .environment(sensorManager)
-                        .environment(workoutRecorder)
-                        .modelContainer(container)
-                        .onAppear {
-                            seedDefaultDataIfNeeded(context: container.mainContext)
-                        }
+                    LocaleProvider {
+                        ContentView()
+                            .environment(locationManager)
+                            .environment(sensorManager)
+                            .environment(workoutRecorder)
+                            .modelContainer(container)
+                            .onAppear {
+                                seedDefaultDataIfNeeded(context: container.mainContext)
+                            }
+                    }
                 } else {
                     ProgressView()
                         .onAppear { setupContainer() }
@@ -44,7 +50,6 @@ struct myWorkoutsApp: App {
         do {
             modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
-            // Schema changed - delete old database and retry
             deleteOldDatabase()
             do {
                 modelContainer = try ModelContainer(for: schema, configurations: config)
@@ -57,12 +62,10 @@ struct myWorkoutsApp: App {
     private func deleteOldDatabase() {
         guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
         let fm = FileManager.default
-        // SwiftData default store name
         let storeURL = url.appendingPathComponent("default.store")
         try? fm.removeItem(at: storeURL)
         try? fm.removeItem(at: URL(fileURLWithPath: storeURL.path + "-wal"))
         try? fm.removeItem(at: URL(fileURLWithPath: storeURL.path + "-shm"))
-        // Also try the app name
         let appStoreURL = url.appendingPathComponent("myWorkouts.store")
         try? fm.removeItem(at: appStoreURL)
         try? fm.removeItem(at: URL(fileURLWithPath: appStoreURL.path + "-wal"))

@@ -1,0 +1,365 @@
+/* General */
+"App.Name" = "myWorkouts";
+"Settings" = "Settings";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Done" = "Done";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Add" = "Add";
+"Start" = "Start";
+"Stop" = "Stop";
+"Pause" = "Pause";
+"Resume" = "Resume";
+"OK" = "OK";
+"Yes" = "Yes";
+"No" = "No";
+"None" = "None";
+"N/A" = "N/A";
+"Error" = "Error";
+"Loading" = "Loading...";
+"Not.set" = "Not set";
+
+/* Navigation */
+"Tab.Home" = "Home";
+"Tab.Record" = "Record";
+"Tab.History" = "History";
+"Tab.Analysis" = "Analysis";
+"Tab.Settings" = "Settings";
+
+/* Home */
+"Home.Title" = "myWorkouts";
+"Home.LastWorkout" = "LAST WORKOUT";
+"Home.Statistics" = "STATISTICS OVERVIEW";
+"Home.WeeklyGoals" = "WEEKLY GOALS";
+"Home.NoWorkouts" = "No workouts yet";
+"Home.START" = "START";
+"Home.Count" = "Count";
+"Home.Duration" = "Duration";
+"Home.Calories" = "Calories";
+"Home.Distance" = "Distance";
+"Home.Incline" = "Incline";
+"Home.PerWeek" = "Per Week";
+"Home.RelativeToReference" = "Relative to Reference";
+"Home.AbsoluteValues" = "Absolute Values";
+
+/* Record */
+"Record.CurrentWorkout" = "Current Workout";
+"Record.WorkoutSetup" = "Workout Setup";
+"Record.Sport" = "Sport";
+"Record.Intensity" = "Intensity";
+"Record.Note" = "Note";
+"Record.UseGPS" = "Use GPS";
+"Record.UseHeartRate" = "Use Heart Rate";
+"Record.CANCEL" = "CANCEL";
+"Record.START" = "START";
+"Record.EndWorkout" = "End Workout?";
+"Record.EndWorkoutMessage" = "Are you sure you want to end this workout?";
+"Record.SaveFailed" = "Save Failed";
+"Record.SaveFailedMessage" = "Failed to save workout. Please try again.";
+
+/* Timer */
+"Timer.Time" = "Time";
+"Timer.Distance" = "Distance";
+"Timer.Pace" = "Pace";
+"Timer.BPM" = "BPM";
+"Timer.Calories" = "Calories";
+"Timer.Elevation" = "Elevation";
+"Timer.Speed" = "Speed";
+"Timer.km" = "km";
+"Timer.min/km" = "min/km";
+"Timer.bpm" = "bpm";
+"Timer.kcal" = "kcal";
+"Timer.m" = "m";
+"Timer.kmh" = "km/h";
+"Timer.kcalmin" = "kcal/min";
+"Timer.kcalh" = "kcal/h";
+
+/* GPS */
+"GPS.Searching" = "Searching...";
+"GPS.Invalid" = "Invalid";
+"GPS.Excellent" = "Excellent";
+"GPS.Good" = "Good";
+"GPS.Fair" = "Fair";
+"GPS.Poor" = "Poor";
+"GPS.Accuracy" = "Accuracy";
+"GPS.Altitude" = "Altitude";
+"GPS.Position" = "Position";
+"GPS.Speed" = "Speed";
+
+/* Tabs */
+"Tab.Timer" = "Timer";
+"Tab.Tachometer" = "Tachometer";
+"Tab.HeartRate" = "Heart Rate";
+"Tab.Sensor" = "Sensor";
+"Tab.Map" = "Map";
+
+/* Heart Rate */
+"HR.Min" = "Min";
+"HR.Max" = "Max";
+"HR.Avg" = "Avg";
+"HR.TargetZone" = "Target Zone";
+"HR.TimeInZone" = "Time in zone";
+"HR.AvgInZone" = "Avg in zone";
+"HR.NoData" = "No heart rate data";
+"HR.ConnectSensor" = "Connect a heart rate sensor to see data here.";
+"HR.TimeTotal" = "Time total";
+"HR.TimeInZone" = "Time in zone";
+"HR.AvgTotal" = "Avg total";
+
+/* Zones */
+"Zone.Below" = "Below";
+"Zone.In" = "In";
+"Zone.Above" = "Above";
+"Zone.FullRange" = "Full Range";
+"Zone.HRRestToMax" = "HR rest ... HR max";
+
+/* Sensor / Diagnosis */
+"Sensor.Bluetooth" = "Bluetooth";
+"Sensor.HeartRateSensor" = "Heart Rate Sensor";
+"Sensor.GPS" = "GPS";
+"Sensor.Recording" = "Recording";
+"Sensor.Connection" = "Connection";
+"Sensor.Connected" = "Connected";
+"Sensor.Disconnected" = "Disconnected";
+"Sensor.Device" = "Device";
+"Sensor.Battery" = "Battery";
+"Sensor.Scanning" = "Scanning";
+"Sensor.Reconnect" = "Reconnect";
+"Sensor.ReconnectionAttempts" = "Reconnection Attempts";
+"Sensor.LastDisconnect" = "Last Disconnect";
+"Sensor.Status" = "Status";
+"Sensor.Auth" = "Auth";
+"Sensor.State" = "State";
+"Sensor.TrackPoints" = "Track Points";
+"Sensor.HRSamples" = "HR Samples";
+"Sensor.CurrentHR" = "Current HR";
+"Sensor.PoweredOn" = "Powered On";
+"Sensor.PoweredOff" = "Powered Off";
+"Sensor.Unauthorized" = "Unauthorized";
+"Sensor.Unsupported" = "Unsupported";
+"Sensor.Unknown" = "Unknown";
+"Sensor.Idle" = "Idle";
+"Sensor.RecordingState" = "Recording";
+"Sensor.Paused" = "Paused";
+"Sensor.Completed" = "Completed";
+"Sensor.Tracking" = "Tracking";
+"Sensor.Off" = "Off";
+"Sensor.NotDetermined" = "Not Determined";
+"Sensor.Restricted" = "Restricted";
+"Sensor.Denied" = "Denied";
+"Sensor.Always" = "Always";
+"Sensor.WhenInUse" = "When In Use";
+"Sensor.AltitudeGPS" = "Altitude (GPS)";
+"Sensor.CadenceInfo" = "Cadence, speed, and temperature data will appear here when connected sensors provide them.";
+
+/* History */
+"History.Title" = "History";
+"History.SearchPlaceholder" = "Search workouts...";
+"History.ManualEntry" = "Manual Entry";
+"History.DeleteWorkout" = "Delete Workout?";
+"History.DeleteWorkoutMessage" = "This action cannot be undone.";
+
+/* Workout Detail */
+"Detail.Facts" = "Facts";
+"Detail.Charts" = "Charts";
+"Detail.HeartRate" = "Heart Rate";
+"Detail.ExportGPX" = "Export GPX";
+"Detail.Delete" = "Delete";
+"Detail.Edit" = "Edit";
+"Detail.Notes" = "Notes";
+"Detail.NoNotes" = "No notes";
+"Detail.Duration" = "Duration";
+"Detail.Distance" = "Distance";
+"Detail.AvgPace" = "Avg Pace";
+"Detail.AvgSpeed" = "Avg Speed";
+"Detail.MaxSpeed" = "Max Speed";
+"Detail.TotalCalories" = "Total Calories";
+"Detail.ElevationGain" = "Elevation Gain";
+
+/* Analysis */
+"Analysis.Title" = "Analysis";
+"Analysis.7Days" = "7 Days";
+"Analysis.30Days" = "30 Days";
+"Analysis.Year" = "Year";
+"Analysis.All" = "All";
+"Analysis.Workouts" = "Workouts";
+"Analysis.km" = "km";
+"Analysis.Duration" = "Duration";
+"Analysis.Calories" = "Calories";
+"Analysis.Elevation" = "Elevation";
+
+/* Goals */
+"Goals.Title" = "Goals";
+"Goals.PersonalGoals" = "Personal Goals";
+"Goals.Weekly" = "Weekly";
+"Goals.NoGoals" = "No goals set";
+
+/* Settings */
+"Settings.Goals" = "Goals";
+"Settings.BiologicalData" = "Biological Data";
+"Settings.Gender" = "Gender";
+"Settings.BirthDate" = "Birth Date";
+"Settings.Weight" = "Weight";
+"Settings.Height" = "Height";
+"Settings.VO2Max" = "VO2 Max";
+"Settings.Units" = "Units";
+"Settings.UnitSystem" = "Unit System";
+"Settings.Metric" = "Metric";
+"Settings.Imperial" = "Imperial";
+"Settings.HeartRateZones" = "Heart Rate Zones";
+"Settings.ManageZones" = "Manage Zones";
+"Settings.WorkoutTypes" = "Workout Types";
+"Settings.ManageTypes" = "Manage Types";
+"Settings.Language" = "Language";
+"Settings.System" = "System";
+"Settings.Info" = "Info / About";
+"Settings.Version" = "Version";
+"Settings.PrivacyPolicy" = "Privacy Policy";
+"Settings.TermsOfUse" = "Terms of Use";
+"Settings.SendFeedback" = "Send Feedback";
+"Settings.Website" = "Website";
+"Settings.NoProfile" = "No profile set";
+
+/* Edit Profile */
+"EditProfile.Title" = "Edit Profile";
+"EditProfile.PersonalInfo" = "Personal Information";
+"EditProfile.Measurements" = "Measurements";
+"EditProfile.mlkgmin" = "ml/kg/min";
+
+/* Heart Rate Zones */
+"HRZones.Title" = "Heart Rate Zones";
+"HRZones.AddZone" = "Add Zone";
+"HRZones.EditZone" = "Edit Zone";
+"HRZones.ZoneName" = "Zone Name";
+"HRZones.ZoneInfo" = "Zone Info";
+"HRZones.ZoneNumber" = "Zone Number";
+"HRZones.HeartRateRange" = "Heart Rate Range";
+"HRZones.MinHR" = "Min HR";
+"HRZones.MaxHR" = "Max HR";
+"HRZones.Description" = "Description";
+
+/* Workout Types */
+"WorkoutTypes.Title" = "Workout Types";
+"WorkoutTypes.AddSport" = "Add Sport Type";
+"WorkoutTypes.EditSport" = "Edit Sport Type";
+"WorkoutTypes.SportInfo" = "Sport Info";
+"WorkoutTypes.Name" = "Name";
+"WorkoutTypes.Abbreviation" = "Abbreviation";
+"WorkoutTypes.Color" = "Color";
+"WorkoutTypes.NamePlaceholder" = "Name (e.g., Indoor Cycling)";
+"WorkoutTypes.AbbrPlaceholder" = "Abbreviation (e.g., IC)";
+
+/* Intensity */
+"Intensity.Easy" = "Easy";
+"Intensity.Moderate" = "Moderate";
+"Intensity.Hard" = "Hard";
+"Intensity.VeryHard" = "Very Hard";
+"Intensity.Maximum" = "Maximum";
+
+/* Goal Types */
+"GoalType.Workouts" = "Workouts";
+"GoalType.Duration" = "Duration";
+"GoalType.Calories" = "Calories";
+"GoalType.Distance" = "Distance";
+"GoalType.Elevation" = "Elevation";
+
+/* Time */
+"Time.DaysAgo" = "%d days ago";
+"Time.HoursAgo" = "%d hours ago";
+"Time.MinutesAgo" = "%d minutes ago";
+"Time.JustNow" = "Just now";
+
+/* Missing Keys - Detail */
+"Detail.Metrics" = "Metrics";
+"Detail.Track" = "Track";
+"Detail.Manual" = "Manual";
+"Detail.TargetZone" = "Target Zone";
+"Detail.TimeInZone" = "Time in zone";
+"Detail.AvgInZone" = "Avg in zone";
+"Detail.NoHeartRateData" = "No heart rate data recorded for this workout.";
+"Detail.EditWorkout" = "Edit Workout";
+
+/* Missing Keys - Analysis */
+"Analysis.NoData" = "No Data";
+"Analysis.RecordToSee" = "Record workouts to see analysis here.";
+"Analysis.WorkoutFrequency" = "Workout Frequency";
+"Analysis.DistanceOverTime" = "Distance Over Time";
+
+/* Missing Keys - History */
+"History.NoWorkouts" = "No Workouts";
+"History.RecordFirst" = "Record your first workout to see it here.";
+"History.BpmAvg" = "bpm avg";
+
+/* Missing Keys - Goal */
+"Goal.WeeklyProgress" = "Weekly Progress";
+"Goal.AddGoal" = "Add Goal";
+"Goal.Workouts" = "Workouts";
+"Goal.Duration" = "Duration";
+"Goal.Distance" = "Distance";
+"Goal.Calories" = "Calories";
+"Goal.Weight" = "Weight:";
+"Goal.GoalType" = "Goal Type";
+"Goal.Target" = "Target";
+"Goal.WeeklyGoal" = "Weekly Goal";
+"Goal.Priority" = "Priority";
+"Goal.Low" = "Low";
+"Goal.Medium" = "Medium";
+"Goal.High" = "High";
+"Goal.SaveGoal" = "Save Goal";
+"Goal.NewGoal" = "New Goal";
+
+/* Missing Keys - Setup */
+"Setup.WorkoutType" = "Workout Type";
+"Setup.None" = "None";
+"Setup.Level" = "Level";
+"Setup.OptionalNote" = "Optional note";
+"Setup.TrackRoute" = "Track route";
+"Setup.GPSEnabled" = "GPS recording enabled";
+"Setup.Enable" = "Enable";
+"Setup.BluetoothLE" = "Bluetooth LE HR Sensor";
+"Setup.Disconnect" = "Disconnect";
+"Setup.ScanSensors" = "Scan for Sensors";
+"Setup.LiveHR" = "Live HR: %d bpm";
+"Setup.ConnectedTo" = "Connected to %@";
+"Setup.ConnectSensor" = "Connect a heart rate sensor to see live data";
+
+/* Missing Keys - Manual */
+"Manual.Sport" = "Sport";
+"Manual.SportType" = "Sport Type";
+"Manual.Time" = "Time";
+"Manual.StartTime" = "Start Time";
+"Manual.Min" = "min";
+"Manual.Metrics" = "Metrics";
+"Manual.Notes" = "Notes";
+"Manual.SaveWorkout" = "Save Workout";
+"Manual.ManualEntry" = "Manual Entry";
+
+/* Missing Keys - Live */
+"Live.End" = "End";
+"Live.Alt" = "Alt:";
+"Live.NoHeartRateData" = "No heart rate data";
+"Live.State" = "State";
+
+/* Missing Keys - Home */
+"Home.Goal" = "Goal";
+"Home.Last7Days" = "Last 7 Days";
+"Home.Last30Days" = "Last 30 Days";
+"Home.LastYear" = "Last Year";
+"Home.Total" = "Total";
+"Home.PerWeek7Days" = "Per Week (7 Days)";
+
+/* Missing Keys - HomeView */
+"Home.LastWorkout" = "LAST WORKOUT";
+"Home.START" = "START";
+"Home.Statistics" = "STATISTICS OVERVIEW";
+"Home.WeeklyGoals" = "WEEKLY GOALS";
+"Home.NoWorkouts" = "No workouts yet";
+"Home.Count" = "Count";
+"Home.Duration" = "Duration";
+"Home.Calories" = "Calories";
+"Home.Distance" = "Distance";
+"Home.Incline" = "Incline";
+"Home.PerWeek" = "Per Week";
+"Home.RelativeToReference" = "RELATIVE TO REFERENCE";
+"Home.AbsoluteValues" = "ABSOLUTE VALUES";

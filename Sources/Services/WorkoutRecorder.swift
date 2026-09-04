@@ -25,6 +25,10 @@ final class WorkoutRecorder {
     private var lastLocationTimestamp: Date?
     private var lastAltitude: Double?
 
+    private var userWeight: Double?
+    private var userAge: Int?
+    private var userGender: Gender?
+
     struct TrackPointData {
         let timestamp: Date
         let latitude: Double
@@ -43,7 +47,7 @@ final class WorkoutRecorder {
         checkForIncompleteWorkout()
     }
 
-    func start() {
+    func start(weight: Double? = nil, age: Int? = nil, gender: Gender? = nil) {
         state = .recording
         elapsedSeconds = 0
         distance = 0
@@ -52,6 +56,9 @@ final class WorkoutRecorder {
         trackPoints = []
         sensorSamples = []
         lastAltitude = nil
+        userWeight = weight
+        userAge = age
+        userGender = gender
         startTimer()
         startAutoSave()
     }
@@ -133,7 +140,9 @@ final class WorkoutRecorder {
 
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.elapsedSeconds += 1
+            Task { @MainActor in
+                self?.elapsedSeconds += 1
+            }
         }
     }
 
@@ -175,9 +184,21 @@ final class WorkoutRecorder {
     }
 
     private func calculateCalories(hr: Double) -> Double {
+        guard let weight = userWeight, let age = userAge else {
+            let minutes = elapsedSeconds / 60.0
+            return max(0, hr * minutes * 0.01)
+        }
+
         let minutes = elapsedSeconds / 60.0
-        // Rough estimate: calories ≈ (HR × duration_in_min × 0.001)
-        // More accurate would use user weight and HR zones
-        return hr * minutes * 0.001
+        guard minutes > 0, hr > 0 else { return 0 }
+
+        let caloriesPerMinute: Double
+        if userGender == .female {
+            caloriesPerMinute = (0.4472 * hr + 0.1263 * weight + 0.074 * Double(age) - 20.4022) / 4.184
+        } else {
+            caloriesPerMinute = (0.6309 * hr + 0.1988 * weight + 0.2017 * Double(age) - 55.0969) / 4.184
+        }
+
+        return max(0, caloriesPerMinute * minutes)
     }
 }

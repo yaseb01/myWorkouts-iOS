@@ -20,9 +20,9 @@ struct WorkoutDetailView: View {
         VStack(spacing: 0) {
             // Tab bar
             HStack(spacing: 0) {
-                tabButton(title: "FACTS", index: 0)
-                tabButton(title: "CHARTS", index: 1)
-                tabButton(title: "HEART RATE", index: 2)
+                tabButton(title: "Detail.Facts".localized(), index: 0)
+                tabButton(title: "Detail.Charts".localized(), index: 1)
+                tabButton(title: "Detail.HeartRate".localized(), index: 2)
             }
             .background(Color(.systemGray6))
 
@@ -57,15 +57,15 @@ struct WorkoutDetailView: View {
                 ShareSheet(items: [gpxData])
             }
         }
-        .alert("Delete Workout?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Delete", role: .destructive) {
+        .alert("History.DeleteWorkout".localized(), isPresented: $showDeleteConfirmation) {
+            Button("Cancel".localized(), role: .cancel) { }
+            Button("Delete".localized(), role: .destructive) {
                 modelContext.delete(workout)
                 try? modelContext.save()
                 dismiss()
             }
         } message: {
-            Text("This action cannot be undone.")
+            Text("History.DeleteWorkoutMessage".localized())
         }
     }
 
@@ -111,7 +111,7 @@ struct WorkoutDetailView: View {
                     }
                     Spacer()
                     if workout.isManual {
-                        Text("Manual")
+                        Text("Detail.Manual".localized())
                             .font(.caption)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -124,20 +124,20 @@ struct WorkoutDetailView: View {
 
                 // Heart Rate section
                 if !heartRateSamples.isEmpty {
-                    Text("HEART RATE")
+                    Text("Detail.HeartRate".localized())
                         .font(.caption.bold())
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 0) {
-                        factColumn(label: "Min", value: "\(Int(minHR))", unit: "bpm")
-                        factColumn(label: "Max", value: "\(Int(maxHR))", unit: "bpm")
-                        factColumn(label: "Avg", value: "\(Int(avgHR))", unit: "bpm ø")
+                        factColumn(label: "HR.Min".localized(), value: "\(Int(minHR))", unit: "Timer.bpm".localized())
+                        factColumn(label: "HR.Max".localized(), value: "\(Int(maxHR))", unit: "Timer.bpm".localized())
+                        factColumn(label: "HR.Avg".localized(), value: "\(Int(avgHR))", unit: "History.BpmAvg".localized())
                     }
 
                     HStack(spacing: 0) {
-                        factColumn(label: "Target Zone", value: "\(workout.intensity.minHR)..\(workout.intensity.maxHR)", unit: "bpm")
-                        factColumn(label: "Time in zone", value: timeInZone, unit: "")
-                        factColumn(label: "Avg in zone", value: "\(Int(avgHR))", unit: "bpm")
+                        factColumn(label: "Detail.TargetZone".localized(), value: "\(workout.intensity.minHR)..\(workout.intensity.maxHR)", unit: "Timer.bpm".localized())
+                        factColumn(label: "Detail.TimeInZone".localized(), value: timeInZone, unit: "")
+                        factColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgHR))", unit: "Timer.bpm".localized())
                     }
 
                     // Zone bar
@@ -147,7 +147,7 @@ struct WorkoutDetailView: View {
                 Divider().background(Color.gray.opacity(0.3))
 
                 // Key metrics
-                Text("METRICS")
+                Text("Detail.Metrics".localized())
                     .font(.caption.bold())
                     .foregroundStyle(.secondary)
 
@@ -155,19 +155,19 @@ struct WorkoutDetailView: View {
                     GridItem(.flexible()),
                     GridItem(.flexible())
                 ], spacing: 12) {
-                    metricItem(value: formattedDuration, label: "Duration", icon: "clock")
-                    metricItem(value: String(format: "%.2f km", workout.distance / 1000), label: "Distance", icon: "ruler")
-                    metricItem(value: "\(Int(workout.calories))", label: "Calories", icon: "flame")
-                    metricItem(value: String(format: "%.0f m", workout.elevationGain), label: "Elevation", icon: "mountain.2")
+                    metricItem(value: formattedDuration, label: "Detail.Duration".localized(), icon: "clock")
+                    metricItem(value: String(format: "%.2f km", workout.distance / 1000), label: "Detail.Distance".localized(), icon: "ruler")
+                    metricItem(value: "\(Int(workout.calories))", label: "Detail.TotalCalories".localized(), icon: "flame")
+                    metricItem(value: String(format: "%.0f m", workout.elevationGain), label: "Detail.ElevationGain".localized(), icon: "mountain.2")
                     if workout.distance > 0 && workout.duration > 0 {
-                        metricItem(value: currentPace, label: "Avg Pace", icon: "speedometer")
+                        metricItem(value: currentPace, label: "Detail.AvgPace".localized(), icon: "speedometer")
                     }
                 }
 
                 // Map track
                 if workout.trackPoints.count >= 2 {
                     Divider().background(Color.gray.opacity(0.3))
-                    Text("TRACK")
+                    Text("Detail.Track".localized())
                         .font(.caption.bold())
                         .foregroundStyle(.secondary)
                     StaticMapTrackView(
@@ -182,7 +182,7 @@ struct WorkoutDetailView: View {
                 // Notes
                 if let note = workout.note, !note.isEmpty {
                     Divider().background(Color.gray.opacity(0.3))
-                    Text("NOTES")
+                    Text("Detail.Notes".localized())
                         .font(.caption.bold())
                         .foregroundStyle(.secondary)
                     Text(note)
@@ -195,7 +195,7 @@ struct WorkoutDetailView: View {
                     Button {
                         exportGPX()
                     } label: {
-                        Label("Export GPX", systemImage: "square.and.arrow.up")
+                        Label("Detail.ExportGPX".localized(), systemImage: "square.and.arrow.up")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
@@ -205,7 +205,7 @@ struct WorkoutDetailView: View {
                 Button(role: .destructive) {
                     showDeleteConfirmation = true
                 } label: {
-                    Label("Delete Workout", systemImage: "trash")
+                    Label("Detail.Delete".localized(), systemImage: "trash")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

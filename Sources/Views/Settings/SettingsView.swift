@@ -11,78 +11,88 @@ struct SettingsView: View {
     @State private var showEditSportTypes = false
     @State private var showEditHRZones = false
 
+    @ObservedObject private var languageManager = AppLanguageManager.shared
+
     private var profile: UserProfile? {
         profiles.first
     }
 
     var body: some View {
         List {
-            Section("Goals") {
+            Section("Settings.Goals".localized()) {
                 NavigationLink {
                     GoalView()
                 } label: {
-                    Label("Personal Goals", systemImage: "target")
+                    Label("Settings.PersonalGoals".localized(), systemImage: "target")
                 }
             }
 
-            Section("Biological Data") {
+            Section("Settings.BiologicalData".localized()) {
                 if let profile = profile {
-                    LabeledContent("Gender", value: profile.gender?.rawValue.capitalized ?? "Not set")
-                    LabeledContent("Birth Date", value: profile.birthDate?.formatted(date: .abbreviated, time: .omitted) ?? "Not set")
-                    LabeledContent("Weight", value: profile.weight.map { "\(Int($0)) kg" } ?? "Not set")
-                    LabeledContent("Height", value: profile.height.map { "\(Int($0)) cm" } ?? "Not set")
-                    LabeledContent("VO2 Max", value: profile.vo2max.map { String(format: "%.1f", $0) } ?? "Not set")
+                    LabeledContent("Settings.Gender".localized(), value: profile.gender?.rawValue.capitalized ?? "Not.set".localized())
+                    LabeledContent("Settings.BirthDate".localized(), value: profile.birthDate?.formatted(date: .abbreviated, time: .omitted) ?? "Not.set".localized())
+                    LabeledContent("Settings.Weight".localized(), value: profile.weight.map { "\(Int($0)) kg" } ?? "Not.set".localized())
+                    LabeledContent("Settings.Height".localized(), value: profile.height.map { "\(Int($0)) cm" } ?? "Not.set".localized())
+                    LabeledContent("Settings.VO2Max".localized(), value: profile.vo2max.map { String(format: "%.1f", $0) } ?? "Not.set".localized())
                 } else {
-                    Text("No profile set")
+                    Text("Settings.NoProfile".localized())
                         .foregroundStyle(.secondary)
                 }
-                Button("Edit") { showEditProfile = true }
+                Button("Edit".localized()) { showEditProfile = true }
                     .foregroundStyle(.green)
             }
 
-            Section("Units") {
+            Section("Settings.Units".localized()) {
                 if let profile = profile {
-                    Picker("Unit System", selection: Binding(
+                    Picker("Settings.UnitSystem".localized(), selection: Binding(
                         get: { profile.unitSystem },
                         set: { profile.unitSystem = $0; try? modelContext.save() }
                     )) {
-                        Text("Metric").tag(UnitSystem.metric)
-                        Text("Imperial").tag(UnitSystem.imperial)
+                        Text("Settings.Metric".localized()).tag(UnitSystem.metric)
+                        Text("Settings.Imperial".localized()).tag(UnitSystem.imperial)
                     }
                 }
             }
 
-            Section("Heart Rate Zones") {
+            Section("Settings.Language".localized()) {
+                Picker("Settings.Language".localized(), selection: $languageManager.currentLanguage) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+            }
+
+            Section("Settings.HeartRateZones".localized()) {
                 Button { showEditHRZones = true } label: {
-                    Label("Manage Zones", systemImage: "waveform.path.ecg")
+                    Label("Settings.ManageZones".localized(), systemImage: "waveform.path.ecg")
                 }
                 .foregroundStyle(.green)
             }
 
-            Section("Workout Types") {
+            Section("Settings.WorkoutTypes".localized()) {
                 Button { showEditSportTypes = true } label: {
-                    Label("Manage Types", systemImage: "figure.run")
+                    Label("Settings.ManageTypes".localized(), systemImage: "figure.run")
                 }
                 .foregroundStyle(.green)
             }
 
-            Section("Info / About") {
-                LabeledContent("Version", value: "1.0")
+            Section("Settings.Info".localized()) {
+                LabeledContent("Settings.Version".localized(), value: "1.0")
                 Link(destination: URL(string: "https://www.myworkouts.org/privacy")!) {
-                    Label("Privacy Policy", systemImage: "lock.shield")
+                    Label("Settings.PrivacyPolicy".localized(), systemImage: "lock.shield")
                 }
                 Link(destination: URL(string: "https://www.myworkouts.org/terms-of-use")!) {
-                    Label("Terms of Use", systemImage: "doc.text")
+                    Label("Settings.TermsOfUse".localized(), systemImage: "doc.text")
                 }
                 Link(destination: URL(string: "mailto:info@myworkouts.org")!) {
-                    Label("Send Feedback", systemImage: "envelope")
+                    Label("Settings.SendFeedback".localized(), systemImage: "envelope")
                 }
                 Link(destination: URL(string: "https://www.myworkouts.org")!) {
-                    Label("Website", systemImage: "globe")
+                    Label("Settings.Website".localized(), systemImage: "globe")
                 }
             }
         }
-        .navigationTitle("Settings")
+        .navigationTitle("Settings".localized())
         .sheet(isPresented: $showEditProfile) { EditProfileView(profile: profile) }
         .sheet(isPresented: $showEditSportTypes) { EditSportTypesView() }
         .sheet(isPresented: $showEditHRZones) { EditHRZonesView() }

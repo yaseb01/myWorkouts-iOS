@@ -9,6 +9,9 @@ final class SensorManager: NSObject {
     var batteryLevel: Int = -1
     var deviceName: String = ""
     var errorMessage: String?
+    var bluetoothState: String = "Unknown"
+    var lastDisconnectionTime: Date?
+    var reconnectionAttempts: Int = 0
 
     private var centralManager: CBCentralManager?
     private var connectedPeripheral: CBPeripheral?
@@ -29,6 +32,7 @@ final class SensorManager: NSObject {
             return
         }
         isScanning = true
+        reconnectionAttempts = 0
         centralManager?.scanForPeripherals(withServices: [hrServiceUUID], options: nil)
     }
 
@@ -41,6 +45,12 @@ final class SensorManager: NSObject {
         if let peripheral = connectedPeripheral {
             centralManager?.cancelPeripheralConnection(peripheral)
         }
+    }
+
+    func manualReconnect() {
+        guard let peripheral = connectedPeripheral else { return }
+        reconnectionAttempts += 1
+        centralManager?.connect(peripheral, options: nil)
     }
 }
 
@@ -82,8 +92,25 @@ extension SensorManager: CBPeripheralDelegate {
 
 extension SensorManager: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state != .poweredOn {
-            errorMessage = "Bluetooth is not available"
+        switch central.state {
+        case .poweredOn:
+            bluetoothState = "Powered On"
+            errorMessage = nil
+        case .poweredOff:
+            bluetoothState = "Powered Off"
+            errorMessage = "Bluetooth is turned off"
+        case .unauthorized:
+            bluetoothState = "Unauthorized"
+            errorMessage = "Bluetooth is not authorized"
+        case .unsupported:
+            bluetoothState = "Unsupported"
+            errorMessage = "Bluetooth is not supported"
+        case .resetting:
+            bluetoothState = "Resetting"
+        case .unknown:
+            bluetoothState = "Unknown"
+        @unknown default:
+            bluetoothState = "Unknown"
         }
     }
 
@@ -98,6 +125,7 @@ extension SensorManager: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         isConnected = true
         errorMessage = nil
+        reconnectionAttempts = 0
         peripheral.delegate = self
         peripheral.discoverServices([hrServiceUUID, batteryServiceUUID])
     }
@@ -105,5 +133,13 @@ extension SensorManager: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         isConnected = false
         currentHeartRate = 0
+        lastDisconnectionTime = Date()
+        if connectedPeripheral != nil {
+            reconnectionAttempts += 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                guard let self = self, let peripheral = self.connectedPeripheral else { return }
+                central.connect(peripheral, options: nil)
+            }
+        }
     }
 }

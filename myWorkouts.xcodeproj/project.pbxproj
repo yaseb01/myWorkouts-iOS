@@ -37,6 +37,8 @@
 		AA0000000000000000000028 /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000032 /* WorkoutDetailView.swift */; };
 		AA0000000000000000000029 /* GPXManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000033 /* GPXManager.swift */; };
 		AA0000000000000000000030 /* GoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000034 /* GoalView.swift */; };
+		AA0000000000000000000100 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000100 /* en.lproj */; };
+		AA0000000000000000000101 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000101 /* de.lproj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +86,8 @@
 		AB0000000000000000000032 /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000033 /* GPXManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXManager.swift; sourceTree = "<group>"; };
 		AB0000000000000000000034 /* GoalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000100 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "en.lproj"; sourceTree = "<group>"; };
+		AB0000000000000000000101 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "de.lproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +115,8 @@
 				AD0000000000000000000005 /* myWorkouts */,
 				AD0000000000000000000006 /* myWorkoutsTests */,
 				AD0000000000000000000007 /* Products */,
+				AB0000000000000000000100 /* en.lproj */,
+				AB0000000000000000000101 /* de.lproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -338,6 +344,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000000000000000000006 /* Assets.xcassets in Resources */,
+				AA0000000000000000000100 /* en.lproj in Resources */,
+				AA0000000000000000000101 /* de.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

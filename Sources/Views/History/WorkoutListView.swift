@@ -30,9 +30,9 @@ struct WorkoutListView: View {
         Group {
             if workouts.isEmpty {
                 ContentUnavailableView(
-                    "No Workouts",
+                    "History.NoWorkouts".localized(),
                     systemImage: "figure.run",
-                    description: Text("Record your first workout to see it here.")
+                    description: Text("History.RecordFirst".localized())
                 )
             } else {
                 List {
@@ -48,17 +48,17 @@ struct WorkoutListView: View {
                                 modelContext.delete(workout)
                                 try? modelContext.save()
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Label("Delete".localized(), systemImage: "trash")
                             }
                         }
                     }
                 }
                 .listStyle(.plain)
-                .searchable(text: $searchText, prompt: "Search workouts")
+                .searchable(text: $searchText, prompt: "History.SearchPlaceholder".localized())
             }
         }
         .background(Color(.systemBackground))
-        .navigationTitle("History")
+        .navigationTitle("History.Title".localized())
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

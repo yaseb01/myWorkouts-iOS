@@ -11,6 +11,7 @@ struct HomeView: View {
     enum DisplayMode {
         case absolute
         case percentage
+        case perWeek
     }
 
     var body: some View {
@@ -26,7 +27,7 @@ struct HomeView: View {
             }
         }
         .background(Color(.systemBackground))
-        .navigationTitle("myWorkouts")
+        .navigationTitle("Home.Title".localized())
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
@@ -43,7 +44,7 @@ struct HomeView: View {
 
     private var lastWorkoutSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("LAST WORKOUT")
+            Text("Home.LastWorkout".localized())
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
@@ -89,11 +90,11 @@ struct HomeView: View {
                                     .foregroundStyle(.secondary)
                             }
                             if lastAvgHR(last) > 0 {
-                                Text("\(Int(lastAvgHR(last))) bpm ø")
+                                Text("\(Int(lastAvgHR(last))) \("History.BpmAvg".localized())")
                                     .font(.subheadline)
                                     .foregroundStyle(.green)
                             }
-                            Text("\(Int(last.calories)) kcal")
+                            Text("\(Int(last.calories)) \("Timer.kcal".localized())")
                                 .font(.subheadline)
                                 .foregroundStyle(.green)
                         }
@@ -105,7 +106,7 @@ struct HomeView: View {
                             Image(systemName: "play.fill")
                                 .font(.title)
                                 .foregroundStyle(.green)
-                            Text("START")
+                            Text("Home.START".localized())
                                 .font(.caption.bold())
                                 .foregroundStyle(.green)
                         }
@@ -123,7 +124,7 @@ struct HomeView: View {
                         Image(systemName: "figure.run")
                             .font(.largeTitle)
                             .foregroundStyle(.secondary)
-                        Text("No workouts yet")
+                        Text("Home.NoWorkouts".localized())
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 24)
@@ -141,7 +142,7 @@ struct HomeView: View {
 
         return VStack(alignment: .leading, spacing: 0) {
             // Section title
-            Text("STATISTICS OVERVIEW")
+            Text("Home.Statistics".localized())
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 10)
@@ -164,11 +165,11 @@ struct HomeView: View {
 
             // Data rows with vertical labels
             VStack(spacing: 3) {
-                statRow(label: "Count", values: stats.map { $0.count }, goalValue: stats[0].count, mode: displayMode)
-                statRow(label: "Duration", values: stats.map { $0.duration }, goalValue: stats[0].duration, mode: displayMode)
-                statRow(label: "Calories", values: stats.map { $0.calories }, goalValue: stats[0].calories, mode: displayMode)
-                statRow(label: "Distance", values: stats.map { $0.distance }, goalValue: stats[0].distance, mode: displayMode)
-                statRow(label: "Incline", values: stats.map { $0.elevation }, goalValue: stats[0].elevation, mode: displayMode)
+                statRow(label: "Home.Count".localized(), values: stats.map { $0.count }, goalValue: stats[0].count, mode: displayMode)
+                statRow(label: "Home.Duration".localized(), values: stats.map { $0.duration }, goalValue: stats[0].duration, mode: displayMode)
+                statRow(label: "Home.Calories".localized(), values: stats.map { $0.calories }, goalValue: stats[0].calories, mode: displayMode)
+                statRow(label: "Home.Distance".localized(), values: stats.map { $0.distance }, goalValue: stats[0].distance, mode: displayMode)
+                statRow(label: "Home.Incline".localized(), values: stats.map { $0.elevation }, goalValue: stats[0].elevation, mode: displayMode)
             }
 
             // Toggle button
@@ -176,10 +177,17 @@ struct HomeView: View {
                 Spacer()
                 Button {
                     withAnimation {
-                        displayMode = displayMode == .percentage ? .absolute : .percentage
+                        switch displayMode {
+                        case .percentage:
+                            displayMode = .absolute
+                        case .absolute:
+                            displayMode = .perWeek
+                        case .perWeek:
+                            displayMode = .percentage
+                        }
                     }
                 } label: {
-                    Text(displayMode == .percentage ? "RELATIVE TO REFERENCE" : "ABSOLUTE VALUES")
+                    Text(displayModeLabel)
                         .font(.subheadline.bold())
                         .foregroundStyle(.white)
                         .padding(.horizontal, 32)
@@ -193,8 +201,16 @@ struct HomeView: View {
         }
     }
 
+    private var displayModeLabel: String {
+        switch displayMode {
+        case .percentage: return "Home.RelativeToReference".localized()
+        case .absolute: return "Home.AbsoluteValues".localized()
+        case .perWeek: return "Home.PerWeek7Days".localized()
+        }
+    }
+
     private var statHeaders: [String] {
-        ["Goal", "Last\n7 Days", "Last\n30 Days", "Last\nYear"]
+        ["Home.Goal".localized(), "Home.Last7Days".localized(), "Home.Last30Days".localized(), "Home.LastYear".localized(), "Home.Total".localized()]
     }
 
     private func statRow(label: String, values: [Double], goalValue: Double, mode: DisplayMode) -> some View {
@@ -220,47 +236,82 @@ struct HomeView: View {
     }
 
     private func cellContent(label: String, value: Double, goalValue: Double, index: Int, mode: DisplayMode) -> (text: String, color: Color) {
+        let isGoalColumn = index == 0
+        let isTotalColumn = index == 4
+
         // Goal column (index 0)
-        if index == 0 {
-            if mode == .percentage {
+        if isGoalColumn {
+            switch mode {
+            case .percentage:
                 return ("100%", .green)
-            } else {
+            case .absolute, .perWeek:
                 return (goalAbsoluteText(label: label, value: value), .green)
             }
         }
 
-        // Period columns
-        if value == 0 && mode == .percentage {
-            return ("--", Color(.systemGray4))
+        // Calculate per-week factor for normalization
+        let days: Int
+        if isTotalColumn {
+            days = max(1, Calendar.current.dateComponents([.day], from: allWorkouts.last?.startTime ?? Date(), to: Date()).day ?? 7)
+        } else {
+            days = [7, 30, 365][index - 1]
         }
+        let factor = 7.0 / Double(days)
 
         switch mode {
         case .percentage:
+            if value == 0 {
+                return ("--", Color(.systemGray4))
+            }
             let pct = goalValue > 0 ? (value / goalValue * 100) : 0
             return ("\(Int(pct))%", percentageColor(pct))
+
         case .absolute:
+            if value == 0 {
+                return ("--", Color(.systemGray4))
+            }
             return (absoluteText(label: label, value: value), periodColors[index])
+
+        case .perWeek:
+            let normalizedValue = value * factor
+            if normalizedValue < 0.1 && value > 0 {
+                return (String(format: "%.2f", normalizedValue), periodColors[index])
+            } else if normalizedValue == 0 {
+                return ("--", Color(.systemGray4))
+            }
+            return (perWeekText(label: label, value: normalizedValue), periodColors[index])
+        }
+    }
+
+    private func perWeekText(label: String, value: Double) -> String {
+        switch label {
+        case "Home.Count".localized(): return String(format: "%.1f", value)
+        case "Home.Duration".localized(): return formatDurationShort(value * 7)
+        case "Home.Calories".localized(): return String(format: "%.0f", value)
+        case "Home.Distance".localized(): return String(format: "%.1f", value)
+        case "Home.Incline".localized(): return value > 0 ? String(format: "%.0f", value) : "--"
+        default: return String(format: "%.0f", value)
         }
     }
 
     private func goalAbsoluteText(label: String, value: Double) -> String {
         switch label {
-        case "Count": return "\(Int(value))"
-        case "Duration": return formatDurationShort(value)
-        case "Calories": return "\(Int(value))'"
-        case "Distance": return String(format: "%.0f", value)
-        case "Incline": return "--"
+        case "Home.Count".localized(): return "\(Int(value))"
+        case "Home.Duration".localized(): return formatDurationShort(value)
+        case "Home.Calories".localized(): return "\(Int(value))'"
+        case "Home.Distance".localized(): return String(format: "%.0f", value)
+        case "Home.Incline".localized(): return "--"
         default: return "\(Int(value))"
         }
     }
 
     private func absoluteText(label: String, value: Double) -> String {
         switch label {
-        case "Count": return "\(Int(value))"
-        case "Duration": return formatDurationShort(value)
-        case "Calories": return "\(Int(value))"
-        case "Distance": return String(format: "%.0f", value)
-        case "Incline": return value > 0 ? "\(Int(value))" : "--"
+        case "Home.Count".localized(): return "\(Int(value))"
+        case "Home.Duration".localized(): return formatDurationShort(value)
+        case "Home.Calories".localized(): return "\(Int(value))"
+        case "Home.Distance".localized(): return String(format: "%.0f", value)
+        case "Home.Incline".localized(): return value > 0 ? "\(Int(value))" : "--"
         default: return "\(Int(value))"
         }
     }
@@ -279,14 +330,15 @@ struct HomeView: View {
         .green,
         Color(red: 0.9, green: 0.6, blue: 0.1),
         Color(red: 0.9, green: 0.4, blue: 0.1),
-        Color(red: 0.9, green: 0.2, blue: 0.1)
+        Color(red: 0.9, green: 0.2, blue: 0.1),
+        .blue
     ]
 
     // MARK: - Goals
 
     private var goalsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("WEEKLY GOALS")
+            Text("Home.WeeklyGoals".localized())
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
@@ -368,7 +420,16 @@ struct HomeView: View {
             )
         }
 
-        return [goal] + periodStats
+        // Total stats
+        let total = PeriodStat(
+            count: Double(allWorkouts.count),
+            duration: allWorkouts.reduce(0) { $0 + $1.duration },
+            calories: allWorkouts.reduce(0) { $0 + $1.calories },
+            distance: allWorkouts.reduce(0) { $0 + $1.distance },
+            elevation: allWorkouts.reduce(0) { $0 + $1.elevationGain }
+        )
+
+        return [goal] + periodStats + [total]
     }
 
     private var thisWeekWorkouts: [Workout] {

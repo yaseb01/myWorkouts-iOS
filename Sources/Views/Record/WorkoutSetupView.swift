@@ -14,6 +14,7 @@ struct WorkoutSetupView: View {
     @State private var note: String = ""
     @State private var showLiveWorkout = false
     @State private var selectedTab = 0
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,8 +40,8 @@ struct WorkoutSetupView: View {
 
             // Bottom buttons
             HStack(spacing: 16) {
-                Button("CANCEL") {
-                    // dismiss or pop
+                Button("Record.CANCEL".localized()) {
+                    dismiss()
                 }
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -55,7 +56,7 @@ struct WorkoutSetupView: View {
                     HStack {
                         Image(systemName: "play.fill")
                             .foregroundStyle(.green)
-                        Text("START")
+                        Text("Record.START".localized())
                             .font(.headline)
                             .foregroundStyle(.white)
                     }
@@ -69,7 +70,7 @@ struct WorkoutSetupView: View {
             .padding()
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Start Workout")
+        .navigationTitle("Record.WorkoutSetup".localized())
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showLiveWorkout) {
             WorkoutLiveView(
@@ -107,11 +108,11 @@ struct WorkoutSetupView: View {
             VStack(spacing: 20) {
                 // Workout Type
                 HStack {
-                    Text("Workout Type")
+                    Text("Setup.WorkoutType".localized())
                         .foregroundStyle(.white)
                     Spacer()
                     Picker("", selection: $selectedSportType) {
-                        Text("None").tag(nil as SportType?)
+                        Text("Setup.None".localized()).tag(nil as SportType?)
                         ForEach(sportTypes) { sport in
                             Text(sport.name).tag(sport as SportType?)
                         }
@@ -125,7 +126,7 @@ struct WorkoutSetupView: View {
 
                 // Level
                 HStack {
-                    Text("Level")
+                    Text("Setup.Level".localized())
                         .foregroundStyle(.white)
                     Spacer()
                     Picker("", selection: $intensity) {
@@ -142,9 +143,9 @@ struct WorkoutSetupView: View {
 
                 // Note
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Note")
+                    Text("Record.Note".localized())
                         .foregroundStyle(.secondary)
-                    TextField("Optional note", text: $note, axis: .vertical)
+                    TextField("Setup.OptionalNote".localized(), text: $note, axis: .vertical)
                         .lineLimit(2...4)
                         .foregroundStyle(.white)
                 }
@@ -161,7 +162,7 @@ struct WorkoutSetupView: View {
     private var gpsTab: some View {
         VStack(spacing: 16) {
             Toggle(isOn: $useGPS) {
-                Label("Track route", systemImage: "map")
+                Label("Setup.TrackRoute".localized(), systemImage: "map")
                     .foregroundStyle(.white)
             }
             .tint(.green)
@@ -173,7 +174,7 @@ struct WorkoutSetupView: View {
                 HStack {
                     Image(systemName: "location.fill")
                         .foregroundStyle(.green)
-                    Text("GPS recording enabled")
+                    Text("Setup.GPSEnabled".localized())
                         .foregroundStyle(.white)
                     Spacer()
                     if locationManager.authorizationStatus == .authorizedWhenInUse ||
@@ -181,7 +182,7 @@ struct WorkoutSetupView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                     } else {
-                        Button("Enable") {
+                        Button("Setup.Enable".localized()) {
                             locationManager.requestWhenInUseAuthorization()
                         }
                         .foregroundStyle(.green)
@@ -202,7 +203,7 @@ struct WorkoutSetupView: View {
     private var bluetoothTab: some View {
         VStack(spacing: 16) {
             Toggle(isOn: $useHeartRate) {
-                Label("Bluetooth LE HR Sensor", systemImage: "heart.fill")
+                Label("Setup.BluetoothLE".localized(), systemImage: "heart.fill")
                     .foregroundStyle(.white)
             }
             .tint(.green)
@@ -219,13 +220,13 @@ struct WorkoutSetupView: View {
                             Text(sensorManager.deviceName)
                                 .foregroundStyle(.white)
                             if sensorManager.batteryLevel >= 0 {
-                                Text("Battery: \(sensorManager.batteryLevel)%")
+                                Text("Sensor.Battery".localized() + ": \(sensorManager.batteryLevel)%")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
                         Spacer()
-                        Button("Disconnect") {
+                        Button("Setup.Disconnect".localized()) {
                             sensorManager.disconnect()
                         }
                         .foregroundStyle(.red)
@@ -242,7 +243,7 @@ struct WorkoutSetupView: View {
                                 ProgressView()
                                     .tint(.white)
                             }
-                            Text(sensorManager.isScanning ? "Scanning..." : "Scan for Sensors")
+                            Text(sensorManager.isScanning ? "Sensor.Scanning".localized() : "Setup.ScanSensors".localized())
                                 .foregroundStyle(.white)
                         }
                         .frame(maxWidth: .infinity)
@@ -277,7 +278,7 @@ struct WorkoutSetupView: View {
     private var liveHRChart: some View {
         VStack(spacing: 0) {
             // HR Line Chart (simulated with last readings)
-            Text("bpm")
+            Text("Timer.bpm".localized())
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -289,10 +290,10 @@ struct WorkoutSetupView: View {
                 .frame(height: 180)
                 .overlay {
                     VStack {
-                        Text("Live HR: \(sensorManager.currentHeartRate) bpm")
+                        Text(String(format: "Setup.LiveHR".localized(), sensorManager.currentHeartRate))
                             .font(.title2.bold().monospacedDigit())
                             .foregroundStyle(.green)
-                        Text("Connected to \(sensorManager.deviceName)")
+                        Text(String(format: "Setup.ConnectedTo".localized(), sensorManager.deviceName))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -304,9 +305,9 @@ struct WorkoutSetupView: View {
 
             // Zone stats
             HStack(spacing: 0) {
-                zoneStat(label: "Min", value: "\(sensorManager.currentHeartRate - 20)")
-                zoneStat(label: "Max", value: "\(sensorManager.currentHeartRate + 15)")
-                zoneStat(label: "Avg", value: "\(sensorManager.currentHeartRate)")
+                zoneStat(label: "HR.Min".localized(), value: "\(sensorManager.currentHeartRate - 20)")
+                zoneStat(label: "HR.Max".localized(), value: "\(sensorManager.currentHeartRate + 15)")
+                zoneStat(label: "HR.Avg".localized(), value: "\(sensorManager.currentHeartRate)")
             }
             .padding(.horizontal)
             .padding(.top, 8)
@@ -419,7 +420,7 @@ struct WorkoutSetupView: View {
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
 
-            Text("Connect a heart rate sensor to see live data")
+            Text("Setup.ConnectSensor".localized())
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.top, 8)

@@ -38,7 +38,10 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - CLLocationManagerDelegate
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last
+        guard let validLocation = locations.last(where: { location in
+            location.horizontalAccuracy >= 0 && location.horizontalAccuracy < 100
+        }) else { return }
+        currentLocation = validLocation
     }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {

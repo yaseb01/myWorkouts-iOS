@@ -10,13 +10,13 @@ struct GoalView: View {
 
     var body: some View {
         List {
-            Section("Weekly Progress") {
+            Section("Goal.WeeklyProgress".localized()) {
                 weeklyProgressSection
             }
 
-            Section("Goals") {
+            Section("Goals.Title".localized()) {
                 if activeGoals.isEmpty {
-                    Text("No goals set")
+                    Text("Goals.NoGoals".localized())
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(activeGoals) { goal in
@@ -30,11 +30,11 @@ struct GoalView: View {
                 Button {
                     showAddGoal = true
                 } label: {
-                    Label("Add Goal", systemImage: "plus")
+                    Label("Goal.AddGoal".localized(), systemImage: "plus")
                 }
             }
         }
-        .navigationTitle("Goals")
+        .navigationTitle("Goals.Title".localized())
         .sheet(isPresented: $showAddGoal) {
             AddGoalView()
         }
@@ -52,10 +52,10 @@ struct GoalView: View {
             let totalCalories = weekWorkouts.reduce(0) { $0 + $1.calories }
             let totalDistance = weekWorkouts.reduce(0) { $0 + $1.distance } / 1000
 
-            progressRow(label: "Workouts", current: Double(totalWorkouts), goal: workoutsGoalTarget, unit: "")
-            progressRow(label: "Duration", current: totalDuration, goal: durationGoalTarget, unit: "min")
-            progressRow(label: "Distance", current: totalDistance, goal: distanceGoalTarget, unit: "km")
-            progressRow(label: "Calories", current: totalCalories, goal: caloriesGoalTarget, unit: "kcal")
+            progressRow(label: "Goal.Workouts".localized(), current: Double(totalWorkouts), goal: workoutsGoalTarget, unit: "")
+            progressRow(label: "Goal.Duration".localized(), current: totalDuration, goal: durationGoalTarget, unit: "min")
+            progressRow(label: "Goal.Distance".localized(), current: totalDistance, goal: distanceGoalTarget, unit: "km")
+            progressRow(label: "Goal.Calories".localized(), current: totalCalories, goal: caloriesGoalTarget, unit: "kcal")
         }
         .padding(.vertical, 4)
     }
@@ -95,7 +95,7 @@ struct GoalView: View {
             VStack(alignment: .leading) {
                 Text(goal.type.rawValue.capitalized)
                     .font(.headline)
-                Text("Weight: \(goal.weight)")
+                Text("Goal.Weight".localized() + " \(goal.weight)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

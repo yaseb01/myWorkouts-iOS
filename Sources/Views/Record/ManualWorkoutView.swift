@@ -18,60 +18,60 @@ struct ManualWorkoutView: View {
 
     var body: some View {
         Form {
-            Section("Sport") {
-                Picker("Sport Type", selection: $selectedSportType) {
-                    Text("None").tag(nil as SportType?)
+            Section("Manual.Sport".localized()) {
+                Picker("Manual.SportType".localized(), selection: $selectedSportType) {
+                    Text("Setup.None".localized()).tag(nil as SportType?)
                     ForEach(sportTypes) { sport in
                         Text(sport.name).tag(sport as SportType?)
                     }
                 }
             }
 
-            Section("Time") {
-                DatePicker("Start Time", selection: $startTime)
+            Section("Manual.Time".localized()) {
+                DatePicker("Manual.StartTime".localized(), selection: $startTime)
                 HStack {
-                    Text("Duration")
+                    Text("Detail.Duration".localized())
                     Spacer()
-                    TextField("min", value: $durationMinutes, format: .number)
+                    TextField("Manual.Min".localized(), value: $durationMinutes, format: .number)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("min")
+                    Text("Manual.Min".localized())
                         .foregroundStyle(.secondary)
                 }
             }
 
-            Section("Metrics") {
+            Section("Manual.Metrics".localized()) {
                 HStack {
-                    Text("Distance")
+                    Text("Detail.Distance".localized())
                     Spacer()
-                    TextField("km", value: $distance, format: .number)
+                    TextField("Analysis.km".localized(), value: $distance, format: .number)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("km")
+                    Text("Analysis.km".localized())
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("Calories")
+                    Text("Detail.TotalCalories".localized())
                     Spacer()
-                    TextField("kcal", value: $calories, format: .number)
+                    TextField("Timer.kcal".localized(), value: $calories, format: .number)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("kcal")
+                    Text("Timer.kcal".localized())
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("Elevation")
+                    Text("Detail.ElevationGain".localized())
                     Spacer()
-                    TextField("m", value: $elevationGain, format: .number)
+                    TextField("Timer.m".localized(), value: $elevationGain, format: .number)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("m")
+                    Text("Timer.m".localized())
                         .foregroundStyle(.secondary)
                 }
             }
 
-            Section("Intensity") {
-                Picker("Intensity", selection: $intensity) {
+            Section("Record.Intensity".localized()) {
+                Picker("Record.Intensity".localized(), selection: $intensity) {
                     ForEach(IntensityLevel.allCases, id: \.self) { level in
                         Text(level.name).tag(level)
                     }
@@ -79,13 +79,13 @@ struct ManualWorkoutView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Notes") {
+            Section("Manual.Notes".localized()) {
                 TextEditor(text: $note)
                     .frame(minHeight: 60)
             }
 
             Section {
-                Button("Save Workout") {
+                Button("Manual.SaveWorkout".localized()) {
                     saveWorkout()
                 }
                 .font(.headline)
@@ -93,7 +93,7 @@ struct ManualWorkoutView: View {
                 .disabled(durationMinutes <= 0)
             }
         }
-        .navigationTitle("Manual Entry")
+        .navigationTitle("Manual.ManualEntry".localized())
         .navigationBarTitleDisplayMode(.inline)
     }
 

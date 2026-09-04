@@ -5,21 +5,21 @@ import Charts
 struct AnalysisView: View {
     @Query(sort: \Workout.startTime, order: .reverse) private var allWorkouts: [Workout]
 
-    @State private var selectedPeriod = "7 Days"
+    @State private var selectedPeriod = "Analysis.7Days"
     @State private var selectedTab = 0
 
-    private let periods = ["7 Days", "30 Days", "Year", "All"]
+    private let periodKeys = ["Analysis.7Days", "Analysis.30Days", "Analysis.Year", "Analysis.All"]
 
     private var filteredWorkouts: [Workout] {
         let now = Date()
         switch selectedPeriod {
-        case "7 Days":
+        case "Analysis.7Days":
             let start = Calendar.current.date(byAdding: .day, value: -7, to: now)!
             return allWorkouts.filter { $0.startTime >= start }
-        case "30 Days":
+        case "Analysis.30Days":
             let start = Calendar.current.date(byAdding: .day, value: -30, to: now)!
             return allWorkouts.filter { $0.startTime >= start }
-        case "Year":
+        case "Analysis.Year":
             let start = Calendar.current.date(byAdding: .year, value: -1, to: now)!
             return allWorkouts.filter { $0.startTime >= start }
         default:
@@ -31,16 +31,16 @@ struct AnalysisView: View {
         VStack(spacing: 0) {
             // Period picker
             HStack(spacing: 0) {
-                ForEach(periods, id: \.self) { period in
+                ForEach(periodKeys, id: \.self) { periodKey in
                     Button {
-                        withAnimation { selectedPeriod = period }
+                        withAnimation { selectedPeriod = periodKey }
                     } label: {
-                        Text(period)
+                        Text(periodKey.localized())
                             .font(.caption.bold())
-                            .foregroundStyle(selectedPeriod == period ? .green : .white)
+                            .foregroundStyle(selectedPeriod == periodKey ? .green : .white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(selectedPeriod == period ? Color(.systemGray5) : Color.clear)
+                            .background(selectedPeriod == periodKey ? Color(.systemGray5) : Color.clear)
                     }
                 }
             }
@@ -51,9 +51,9 @@ struct AnalysisView: View {
             // Content
             if filteredWorkouts.isEmpty {
                 ContentUnavailableView(
-                    "No Data",
+                    "Analysis.NoData".localized(),
                     systemImage: "chart.line.downtrend.xyaxis",
-                    description: Text("Record workouts to see analysis here.")
+                    description: Text("Analysis.RecordToSee".localized())
                 )
             } else {
                 ScrollView {
@@ -65,7 +65,7 @@ struct AnalysisView: View {
 
                         // Workout count chart
                         if filteredWorkouts.count >= 2 {
-                            chartSection(title: "Workout Frequency") {
+                            chartSection(title: "Analysis.WorkoutFrequency".localized()) {
                                 Chart {
                                     ForEach(filteredWorkouts.suffix(20)) { workout in
                                         BarMark(
@@ -82,7 +82,7 @@ struct AnalysisView: View {
                         // Distance chart
                         if filteredWorkouts.count >= 2 {
                             Divider().background(Color.gray.opacity(0.3))
-                            chartSection(title: "Distance Over Time") {
+                            chartSection(title: "Analysis.DistanceOverTime".localized()) {
                                 Chart {
                                     ForEach(filteredWorkouts.suffix(20)) { workout in
                                         LineMark(
@@ -119,7 +119,7 @@ struct AnalysisView: View {
             }
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Analysis")
+        .navigationTitle("Analysis.Title".localized())
     }
 
     // MARK: - Summary
@@ -132,12 +132,12 @@ struct AnalysisView: View {
 
         return VStack(spacing: 12) {
             HStack(spacing: 0) {
-                statCell(value: "\(filteredWorkouts.count)", label: "Workouts")
-                statCell(value: String(format: "%.1f", totalDistance / 1000), label: "km")
-                statCell(value: formatDuration(totalDuration), label: "Duration")
+                statCell(value: "\(filteredWorkouts.count)", label: "Analysis.Workouts".localized())
+                statCell(value: String(format: "%.1f", totalDistance / 1000), label: "Analysis.km".localized())
+                statCell(value: formatDuration(totalDuration), label: "Analysis.Duration".localized())
             }
             HStack(spacing: 0) {
-                statCell(value: "\(Int(totalCalories))", label: "Calories")
+                statCell(value: "\(Int(totalCalories))", label: "Analysis.Calories".localized())
                 statCell(value: "\(Int(totalElevation))", label: "m")
                 statCell(value: "", label: "")
             }
