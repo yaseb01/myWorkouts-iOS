@@ -3,10 +3,12 @@ import SwiftData
 
 struct HomeView: View {
     @Environment(WorkoutRecorder.self) private var recorder
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Workout.startTime, order: .reverse) private var allWorkouts: [Workout]
     @Query(filter: #Predicate<Goal> { $0.isActive }) private var activeGoals: [Goal]
 
     @State private var displayMode: DisplayMode = .percentage
+    @State private var incompleteWorkout: WorkoutRecorder.IncompleteWorkoutData?
 
     enum DisplayMode {
         case absolute
@@ -38,6 +40,53 @@ struct HomeView: View {
                 }
             }
         }
+        .onAppear {
+            incompleteWorkout = recorder.readIncompleteWorkout()
+        }
+        .alert(
+            "Home.IncompleteTitle".localized(),
+            isPresented: Binding(
+                get: { incompleteWorkout != nil },
+                set: { if !$0 { incompleteWorkout = nil } }
+            )
+        ) {
+            Button("Home.IncompleteSave".localized()) {
+                saveRecoveredWorkout()
+            }
+            Button("Home.IncompleteDiscard".localized(), role: .destructive) {
+                recorder.clearIncompleteWorkout()
+            }
+        } message: {
+            Text("Home.IncompleteMessage".localized() + "\n" + recoveryStatsText)
+        }
+    }
+
+    // MARK: - Crash Recovery
+
+    private var recoveryStatsText: String {
+        guard let data = incompleteWorkout else { return "" }
+        let total = Int(data.duration)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        let duration = h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%02d:%02d", m, s)
+        let km = String(format: "%.2f", data.distance / 1000)
+        return "\(data.date.formatted(date: .abbreviated, time: .shortened)) · \(duration) · \(km) km"
+    }
+
+    private func saveRecoveredWorkout() {
+        guard let data = incompleteWorkout else { return }
+        let workout = Workout(
+            startTime: data.date,
+            endTime: data.date.addingTimeInterval(data.duration),
+            duration: data.duration,
+            distance: data.distance,
+            isManual: true
+        )
+        modelContext.insert(workout)
+        try? modelContext.save()
+        recorder.clearIncompleteWorkout()
+        incompleteWorkout = nil
     }
 
     // MARK: - Last Workout
@@ -101,13 +150,13 @@ struct HomeView: View {
 
                         Spacer()
 
-                        // START button
+                        // Details affordance (row opens the workout detail view)
                         VStack(spacing: 4) {
-                            Image(systemName: "play.fill")
-                                .font(.title)
+                            Image(systemName: "chevron.right")
+                                .font(.title3)
                                 .foregroundStyle(.green)
-                            Text("Home.START".localized())
-                                .font(.caption.bold())
+                            Text("Home.ViewWorkout".localized())
+                                .font(.caption2.bold())
                                 .foregroundStyle(.green)
                         }
                         .frame(width: 72, height: 72)
@@ -391,7 +440,6 @@ struct HomeView: View {
         let now = Date()
 
         // Goal values (weekly targets from active goals)
-        let weekWorkouts = thisWeekWorkouts
         let goalCount = activeGoals.first(where: { $0.type == .workouts })?.weeklyTarget ?? 3
         let goalDuration = (activeGoals.first(where: { $0.type == .duration })?.weeklyTarget ?? 150) * 60 // minutes to seconds
         let goalCalories = activeGoals.first(where: { $0.type == .calories })?.weeklyTarget ?? 2000
@@ -454,19 +502,13 @@ struct HomeView: View {
     }
 
     private func intensityColor(for level: IntensityLevel) -> Color {
-        switch level {
-        case .easy: return Color(red: 0.6, green: 0.4, blue: 0.8)  // Purple
-        case .moderate: return .green
-        case .hard: return .orange
-        case .veryHard: return .red
-        case .maximum: return Color(red: 0.9, green: 0.2, blue: 0.2)
-        }
+        WorkoutColors.intensity(level)
     }
 
     private func relativeDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.locale = AppLanguageManager.shared.currentLanguage.locale
         return formatter.localizedString(for: date, relativeTo: Date())
     }
 

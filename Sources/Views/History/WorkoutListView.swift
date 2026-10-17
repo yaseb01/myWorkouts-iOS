@@ -9,6 +9,7 @@ struct WorkoutListView: View {
     @State private var selectedSportFilter: String? = nil
     @State private var showManualEntry = false
     @State private var showGPXImport = false
+    @State private var workoutToDelete: Workout?
 
     private var filteredWorkouts: [Workout] {
         var result = workouts
@@ -46,8 +47,7 @@ struct WorkoutListView: View {
                         .listRowBackground(Color(.systemBackground))
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
-                                modelContext.delete(workout)
-                                try? modelContext.save()
+                                workoutToDelete = workout
                             } label: {
                                 Label("Delete".localized(), systemImage: "trash")
                             }
@@ -88,6 +88,25 @@ struct WorkoutListView: View {
         .sheet(isPresented: $showGPXImport) {
             GPXImportView()
         }
+        .confirmationDialog(
+            "History.DeleteWorkout".localized(),
+            isPresented: Binding(
+                get: { workoutToDelete != nil },
+                set: { if !$0 { workoutToDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete".localized(), role: .destructive) {
+                if let workout = workoutToDelete {
+                    modelContext.delete(workout)
+                    try? modelContext.save()
+                }
+                workoutToDelete = nil
+            }
+            Button("Cancel".localized(), role: .cancel) { }
+        } message: {
+            Text("History.DeleteWorkoutMessage".localized())
+        }
     }
 }
 
@@ -100,10 +119,10 @@ private struct WorkoutRow: View {
         HStack(spacing: 10) {
             // Intensity badge (circle with abbreviation)
             Circle()
-                .fill(Color(hex: intensityColor(for: workout.intensity)) ?? .gray)
+                .fill(WorkoutColors.intensity(workout.intensity))
                 .frame(width: 48, height: 48)
                 .overlay {
-                    Text(intensityAbbrev(for: workout.intensity))
+                    Text(workout.intensity.abbreviation)
                         .font(.caption.bold())
                         .foregroundStyle(.white)
                 }
@@ -153,30 +172,9 @@ private struct WorkoutRow: View {
         let h = Int(seconds) / 3600
         let m = (Int(seconds) % 3600) / 60
         let s = Int(seconds) % 60
-        let activeMinutes = Int(seconds) / 60
         if h > 0 {
             return String(format: "%d:%02d:%02d", h, m, s)
         }
         return String(format: "%02d:%02d", m, s)
-    }
-
-    private func intensityColor(for level: IntensityLevel) -> String {
-        switch level {
-        case .easy: return "#8BC34A"      // Light green
-        case .moderate: return "#9C27B0"  // Purple
-        case .hard: return "#F44336"      // Red
-        case .veryHard: return "#FF9800"  // Orange
-        case .maximum: return "#FFEB3B"   // Yellow
-        }
-    }
-
-    private func intensityAbbrev(for level: IntensityLevel) -> String {
-        switch level {
-        case .easy: return "G1"
-        case .moderate: return "G2"
-        case .hard: return "G3"
-        case .veryHard: return "G4"
-        case .maximum: return "G5"
-        }
     }
 }

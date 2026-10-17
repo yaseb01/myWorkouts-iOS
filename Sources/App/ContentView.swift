@@ -140,7 +140,6 @@ struct ContentView: View {
                 Label("Tab.Home".localized(), systemImage: "house")
             }
             .tag(0)
-            .accessibilityLabel("Home tab")
 
             NavigationStack {
                 WorkoutSetupView()
@@ -150,7 +149,6 @@ struct ContentView: View {
                 Label("Tab.Record".localized(), systemImage: "circle.fill")
             }
             .tag(1)
-            .accessibilityLabel("Record tab")
 
             NavigationStack {
                 WorkoutListView()
@@ -160,7 +158,6 @@ struct ContentView: View {
                 Label("Tab.History".localized(), systemImage: "clock.arrow.circlepath")
             }
             .tag(2)
-            .accessibilityLabel("History tab")
 
             NavigationStack {
                 AnalysisView()
@@ -170,7 +167,6 @@ struct ContentView: View {
                 Label("Tab.Analysis".localized(), systemImage: "chart.line.uptrend.xyaxis")
             }
             .tag(3)
-            .accessibilityLabel("Analysis tab")
 
             NavigationStack {
                 SettingsView()
@@ -180,7 +176,6 @@ struct ContentView: View {
                 Label("Tab.Settings".localized(), systemImage: "gearshape")
             }
             .tag(4)
-            .accessibilityLabel("Settings tab")
         }
         .accessibilityElement(children: .contain)
         .preferredColorScheme(.dark)

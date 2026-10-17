@@ -221,7 +221,7 @@ struct WorkoutDetailView: View {
             VStack(spacing: 16) {
                 // HR chart
                 if !heartRateSamples.isEmpty {
-                    chartSection(title: "Heart Rate") {
+                    chartSection(title: "Detail.HeartRate".localized()) {
                         Chart(heartRateSamples) { sample in
                             LineMark(
                                 x: .value("Time", sample.timestamp),
@@ -243,11 +243,11 @@ struct WorkoutDetailView: View {
 
                 // Pace chart
                 if workout.trackPoints.count >= 2 {
-                    chartSection(title: "Pace") {
+                    chartSection(title: "Chart.Pace".localized()) {
                         Chart(Array(paceData.enumerated()), id: \.offset) { index, pace in
                             LineMark(
-                                x: .value("Point", index),
-                                y: .value("Pace", pace)
+                                x: .value("Time", pace.timestamp),
+                                y: .value("Pace", pace.secondsPerKm)
                             )
                             .foregroundStyle(.green)
                             .interpolationMethod(.catmullRom)
@@ -258,7 +258,7 @@ struct WorkoutDetailView: View {
 
                 // Elevation chart
                 if workout.trackPoints.contains(where: { $0.altitude != nil }) {
-                    chartSection(title: "Altitude") {
+                    chartSection(title: "Chart.Altitude".localized()) {
                         Chart(workout.trackPoints.enumerated().filter { $0.element.altitude != nil }, id: \.offset) { index, point in
                             LineMark(
                                 x: .value("Point", index),
@@ -348,6 +348,7 @@ struct WorkoutDetailView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     private func metricItem(value: String, label: String, icon: String) -> some View {
@@ -377,30 +378,32 @@ struct WorkoutDetailView: View {
         let inPct = Double(inZone) / Double(total) * 100
         let abovePct = Double(aboveZone) / Double(total) * 100
 
-        return HStack(spacing: 0) {
-            if belowPct > 0 {
-                Text("\(Int(belowPct))%")
-                    .font(.caption.bold())
-                    .foregroundStyle(.white)
-                    .frame(width: UIScreen.main.bounds.width * belowPct / 100)
-                    .background(.blue)
+        return GeometryReader { geo in
+            HStack(spacing: 0) {
+                if belowPct > 0 {
+                    Text("\(Int(belowPct))%")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .frame(width: geo.size.width * belowPct / 100)
+                        .background(.blue)
+                }
+                if inPct > 0 {
+                    Text("\(Int(inPct))%")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .frame(width: geo.size.width * inPct / 100)
+                        .background(.green)
+                }
+                if abovePct > 0 {
+                    Text("\(Int(abovePct))%")
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .frame(width: geo.size.width * abovePct / 100)
+                        .background(Color(.systemYellow))
+                }
             }
-            if inPct > 0 {
-                Text("\(Int(inPct))%")
-                    .font(.caption.bold())
-                    .foregroundStyle(.white)
-                    .frame(width: UIScreen.main.bounds.width * inPct / 100)
-                    .background(.green)
-            }
-            if abovePct > 0 {
-                Text("\(Int(abovePct))%")
-                    .font(.caption.bold())
-                    .foregroundStyle(.white)
-                    .frame(width: UIScreen.main.bounds.width * abovePct / 100)
-                    .background(Color(.systemYellow))
-            }
+            .frame(height: 28)
         }
-        .frame(height: 28)
     }
 
     // MARK: - HR Histogram
@@ -432,10 +435,7 @@ struct WorkoutDetailView: View {
     }
 
     private func zoneColor(for hr: Int) -> Color {
-        if hr < workout.intensity.minHR { return .blue }
-        if hr <= workout.intensity.maxHR { return .green }
-        if hr <= workout.intensity.maxHR + 20 { return Color(.systemYellow) }
-        return .red
+        WorkoutColors.heartRate(hr, zoneMin: workout.effectiveMinHR, zoneMax: workout.effectiveMaxHR)
     }
 
     // MARK: - Computed
@@ -469,9 +469,9 @@ struct WorkoutDetailView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
-    private var paceData: [Double] {
+    private var paceData: [(timestamp: Date, secondsPerKm: Double)] {
         guard workout.trackPoints.count >= 2 else { return [] }
-        var paces: [Double] = []
+        var paces: [(timestamp: Date, secondsPerKm: Double)] = []
         for i in 1..<workout.trackPoints.count {
             let prev = workout.trackPoints[i - 1]
             let curr = workout.trackPoints[i]
@@ -481,7 +481,7 @@ struct WorkoutDetailView: View {
             )
             let time = curr.timestamp.timeIntervalSince(prev.timestamp)
             if dist > 0, time > 0 {
-                paces.append(time / (dist / 1000))
+                paces.append((timestamp: curr.timestamp, secondsPerKm: time / (dist / 1000)))
             }
         }
         return paces
@@ -537,12 +537,12 @@ struct WorkoutDetailView: View {
     private var editSheet: some View {
         NavigationStack {
             Form {
-                Section("Notes") {
+                Section("Detail.Notes".localized()) {
                     TextEditor(text: $editNote)
                         .frame(minHeight: 60)
                 }
-                Section("Intensity") {
-                    Picker("Intensity", selection: $editIntensity) {
+                Section("Record.Intensity".localized()) {
+                    Picker("Record.Intensity".localized(), selection: $editIntensity) {
                         ForEach(IntensityLevel.allCases, id: \.self) { level in
                             Text(level.name).tag(level)
                         }
@@ -550,14 +550,15 @@ struct WorkoutDetailView: View {
                     .pickerStyle(.segmented)
                 }
             }
-            .navigationTitle("Edit Workout")
+            .navigationTitle("Detail.EditTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { isEditing = false }
+                    Button("Cancel".localized()) { isEditing = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Save".localized()) {
                         workout.note = editNote.isEmpty ? nil : editNote
                         workout.intensity = editIntensity
                         try? modelContext.save()

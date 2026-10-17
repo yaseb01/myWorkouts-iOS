@@ -380,3 +380,64 @@
 "GPX.AccessError" = "Zugriff auf die ausgewählte Datei nicht möglich";
 "GPX.ParseError" = "GPX-Datei konnte nicht gelesen werden";
 "GPX.SaveError" = "Training konnte nicht gespeichert werden";
+
+/* Missing Keys - Crash Recovery */
+"Home.IncompleteTitle" = "Unvollständiges Training";
+"Home.IncompleteMessage" = "Eine Trainingsaufzeichnung wurde unterbrochen. Im Verlauf speichern?";
+"Home.IncompleteSave" = "Training speichern";
+"Home.IncompleteDiscard" = "Verwerfen";
+
+/* Missing Keys - UI Fixes */
+"Home.ViewWorkout" = "Details";
+"Live.Discard" = "Verwerfen";
+"GPS.Denied" = "Standortzugriff verweigert";
+"GPS.OpenSettings" = "Einstellungen";
+"Chart.Pace" = "Tempo";
+"Chart.Altitude" = "Höhe";
+"Detail.EditTitle" = "Training bearbeiten";
+
+/* Missing Keys - HR Zone Sheets */
+"Zones.FullRange" = "Gesamtbereich (HF Ruhe ... HF max)";
+"Zones.Add" = "Zone hinzufügen";
+"Zones.AddTitle" = "Zone hinzufügen";
+"Zones.EditTitle" = "Zone bearbeiten";
+"Zones.NameSection" = "Zonenname";
+"Zones.Name" = "Name";
+"Zones.Description" = "Beschreibung";
+"Zones.DescriptionPlaceholder" = "Beschreibung (z. B. Leichte Erholung)";
+"Zones.RangeSection" = "Herzfrequenzbereich";
+"Zones.InfoSection" = "Zoneninfo";
+"Zones.Number" = "Zonennummer";
+
+/* Missing Keys - Sport Type Sheets */
+"Sport.InfoSection" = "Sportinfo";
+"Sport.Name" = "Name";
+"Sport.Abbreviation" = "Kürzel";
+"Sport.NamePlaceholder" = "Name (z. B. Indoor Cycling)";
+"Sport.AbbrevPlaceholder" = "Kürzel (z. B. IC)";
+"Sport.Color" = "Farbe";
+"Sport.AddTitle" = "Sportart hinzufügen";
+"Sport.EditTitle" = "Sportart bearbeiten";
+
+/* Missing Keys - Profile Sheet */
+"Profile.PersonalInfo" = "Persönliche Daten";
+"Profile.Measurements" = "Messwerte";
+"Profile.Weight" = "Gewicht";
+"Profile.Height" = "Größe";
+"Profile.VO2Max" = "VO2max";
+"Profile.EditTitle" = "Profil bearbeiten";
+
+/* Missing Keys - Goal Sheet */
+"Goal.TypeSection" = "Zieltyp";
+"Goal.Type" = "Typ";
+"Goal.TargetSection" = "Ziel";
+"Goal.TargetHint" = "Für den Wochenfortschritt wird nur ein Ziel pro Typ verwendet.";
+"Goal.WeeklyTarget" = "Wochenziel";
+"Goal.Value" = "Wert";
+"Goal.AlreadyExists" = "Es existiert bereits ein aktives Ziel dieses Typs.";
+"Goal.PrioritySection" = "Priorität";
+"Goal.PriorityLow" = "Niedrig";
+"Goal.PriorityMedium" = "Mittel";
+"Goal.PriorityHigh" = "Hoch";
+"Goal.Save" = "Ziel speichern";
+"Goal.NewTitle" = "Neues Ziel";

@@ -142,45 +142,63 @@ struct GoalView: View {
 struct AddGoalView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query(filter: #Predicate<Goal> { $0.isActive }) private var activeGoals: [Goal]
 
     @State private var selectedType: GoalType = .workouts
     @State private var weeklyTarget: Double = 3
     @State private var weight: Int = 1
 
+    private var isDuplicateType: Bool {
+        activeGoals.contains { $0.type == selectedType }
+    }
+
+    private var isValid: Bool {
+        weeklyTarget > 0 && !isDuplicateType
+    }
+
     var body: some View {
         NavigationStack {
             Form {
-                Section("Goal Type") {
-                    Picker("Type", selection: $selectedType) {
+                Section("Goal.TypeSection".localized()) {
+                    Picker("Goal.Type".localized(), selection: $selectedType) {
                         ForEach(GoalType.allCases, id: \.self) { type in
                             Text(type.rawValue.capitalized).tag(type)
                         }
                     }
                 }
 
-                Section("Target") {
+                Section {
                     HStack {
-                        Text("Weekly Goal")
+                        Text("Goal.WeeklyTarget".localized())
                         Spacer()
-                        TextField("Value", value: $weeklyTarget, format: .number)
+                        TextField("Goal.Value".localized(), value: $weeklyTarget, format: .number)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                         Text(selectedType.unit)
                             .foregroundStyle(.secondary)
                     }
+                    if isDuplicateType {
+                        Text("Goal.AlreadyExists".localized())
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                } header: {
+                    Text("Goal.TargetSection".localized())
+                } footer: {
+                    Text("Goal.TargetHint".localized())
                 }
 
-                Section("Priority") {
-                    Picker("Weight", selection: $weight) {
-                        Text("Low").tag(1)
-                        Text("Medium").tag(2)
-                        Text("High").tag(3)
+                Section("Goal.PrioritySection".localized()) {
+                    Picker("Goal.Weight".localized(), selection: $weight) {
+                        Text("Goal.PriorityLow".localized()).tag(1)
+                        Text("Goal.PriorityMedium".localized()).tag(2)
+                        Text("Goal.PriorityHigh".localized()).tag(3)
                     }
                     .pickerStyle(.segmented)
                 }
 
                 Section {
-                    Button("Save Goal") {
+                    Button("Goal.Save".localized()) {
                         let goal = Goal(
                             type: selectedType,
                             weeklyTarget: weeklyTarget,
@@ -192,13 +210,15 @@ struct AddGoalView: View {
                     }
                     .font(.headline)
                     .frame(maxWidth: .infinity)
+                    .disabled(!isValid)
                 }
             }
-            .navigationTitle("New Goal")
+            .navigationTitle("Goal.NewTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel".localized()) { dismiss() }
                 }
             }
         }

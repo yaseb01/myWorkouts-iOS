@@ -380,3 +380,64 @@
 "GPX.AccessError" = "Could not access the selected file";
 "GPX.ParseError" = "Could not parse GPX file";
 "GPX.SaveError" = "Could not save workout";
+
+/* Missing Keys - Crash Recovery */
+"Home.IncompleteTitle" = "Unfinished Workout";
+"Home.IncompleteMessage" = "A workout recording was interrupted. Save it to your history?";
+"Home.IncompleteSave" = "Save Workout";
+"Home.IncompleteDiscard" = "Discard";
+
+/* Missing Keys - UI Fixes */
+"Home.ViewWorkout" = "Details";
+"Live.Discard" = "Discard";
+"GPS.Denied" = "Location access denied";
+"GPS.OpenSettings" = "Settings";
+"Chart.Pace" = "Pace";
+"Chart.Altitude" = "Altitude";
+"Detail.EditTitle" = "Edit Workout";
+
+/* Missing Keys - HR Zone Sheets */
+"Zones.FullRange" = "Full Range (HR rest ... HR max)";
+"Zones.Add" = "Add Zone";
+"Zones.AddTitle" = "Add Zone";
+"Zones.EditTitle" = "Edit Zone";
+"Zones.NameSection" = "Zone Name";
+"Zones.Name" = "Name";
+"Zones.Description" = "Description";
+"Zones.DescriptionPlaceholder" = "Description (e.g., Easy / Recovery)";
+"Zones.RangeSection" = "Heart Rate Range";
+"Zones.InfoSection" = "Zone Info";
+"Zones.Number" = "Zone Number";
+
+/* Missing Keys - Sport Type Sheets */
+"Sport.InfoSection" = "Sport Info";
+"Sport.Name" = "Name";
+"Sport.Abbreviation" = "Abbreviation";
+"Sport.NamePlaceholder" = "Name (e.g., Indoor Cycling)";
+"Sport.AbbrevPlaceholder" = "Abbreviation (e.g., IC)";
+"Sport.Color" = "Color";
+"Sport.AddTitle" = "Add Sport Type";
+"Sport.EditTitle" = "Edit Sport Type";
+
+/* Missing Keys - Profile Sheet */
+"Profile.PersonalInfo" = "Personal Information";
+"Profile.Measurements" = "Measurements";
+"Profile.Weight" = "Weight";
+"Profile.Height" = "Height";
+"Profile.VO2Max" = "VO2 Max";
+"Profile.EditTitle" = "Edit Profile";
+
+/* Missing Keys - Goal Sheet */
+"Goal.TypeSection" = "Goal Type";
+"Goal.Type" = "Type";
+"Goal.TargetSection" = "Target";
+"Goal.TargetHint" = "Only one goal per type is used for the weekly progress.";
+"Goal.WeeklyTarget" = "Weekly Goal";
+"Goal.Value" = "Value";
+"Goal.AlreadyExists" = "An active goal of this type already exists.";
+"Goal.PrioritySection" = "Priority";
+"Goal.PriorityLow" = "Low";
+"Goal.PriorityMedium" = "Medium";
+"Goal.PriorityHigh" = "High";
+"Goal.Save" = "Save Goal";
+"Goal.NewTitle" = "New Goal";

@@ -86,10 +86,14 @@ struct WorkoutLiveView: View {
             }
         }
         .alert("Record.EndWorkout".localized(), isPresented: $showStopConfirmation) {
-            Button("Cancel".localized(), role: .cancel) { }
-            Button("Live.End".localized(), role: .destructive) {
+            Button("Live.End".localized()) {
+                Haptics.tap()
                 finishWorkout()
             }
+            Button("Live.Discard".localized(), role: .destructive) {
+                discardWorkout()
+            }
+            Button("Cancel".localized(), role: .cancel) { }
         } message: {
             Text("Record.EndWorkoutMessage".localized())
         }
@@ -211,6 +215,14 @@ struct WorkoutLiveView: View {
             Text(gpsStatusText)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            if locationManager.authorizationStatus == .denied {
+                Button("GPS.OpenSettings".localized()) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .font(.caption.bold())
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -219,6 +231,12 @@ struct WorkoutLiveView: View {
     }
 
     private var gpsStatusText: String {
+        switch locationManager.authorizationStatus {
+        case .denied, .restricted:
+            return "GPS.Denied".localized()
+        default:
+            break
+        }
         guard let location = locationManager.currentLocation else {
             return "GPS.Searching".localized()
         }
@@ -237,6 +255,9 @@ struct WorkoutLiveView: View {
     }
 
     private var gpsAccuracyColor: Color {
+        if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
+            return .red
+        }
         guard let location = locationManager.currentLocation else { return .gray }
         let accuracy = location.horizontalAccuracy
         if accuracy < 0 { return .red }
@@ -262,6 +283,7 @@ struct WorkoutLiveView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Tachometer View (HR Chart + Zones)
@@ -542,6 +564,7 @@ struct WorkoutLiveView: View {
         HStack(spacing: 24) {
             if recorder.state == .recording {
                 Button {
+                    Haptics.tap()
                     recorder.pause()
                 } label: {
                     Image(systemName: "pause.fill")
@@ -553,6 +576,7 @@ struct WorkoutLiveView: View {
                 }
             } else if recorder.state == .paused {
                 Button {
+                    Haptics.tap()
                     recorder.resume()
                 } label: {
                     Image(systemName: "play.fill")
@@ -591,7 +615,7 @@ struct WorkoutLiveView: View {
 
         return Chart(hrSamples) { point in
             LineMark(
-                x: .value("Time", point.index),
+                x: .value("Time", point.timestamp),
                 y: .value("BPM", point.value)
             )
             .foregroundStyle(.green)
@@ -599,7 +623,7 @@ struct WorkoutLiveView: View {
 
             // Zone color overlay
             AreaMark(
-                x: .value("Time", point.index),
+                x: .value("Time", point.timestamp),
                 y: .value("BPM", point.value)
             )
             .foregroundStyle(zoneColor(for: Int(point.value)).opacity(0.3))
@@ -739,10 +763,7 @@ struct WorkoutLiveView: View {
     }
 
     private func zoneColor(for hr: Int) -> Color {
-        if hr < intensity.minHR { return .blue }
-        if hr <= intensity.maxHR { return .green }
-        if hr <= intensity.maxHR + 20 { return Color(.systemYellow) }
-        return .red
+        WorkoutColors.heartRate(hr, zoneMin: intensity.minHR, zoneMax: intensity.maxHR)
     }
 
     private func zoneColor(for hr: Double) -> Color {
@@ -817,13 +838,20 @@ struct WorkoutLiveView: View {
         }
     }
 
+    private func discardWorkout() {
+        recorder.stop()
+        locationManager.stopTracking()
+        sensorManager.stopScanning()
+        dismiss()
+    }
+
     private func finishWorkout() {
         let endTime = Date()
         let duration = recorder.elapsedSeconds
 
         let workout = Workout(
             sportType: sportType,
-            startTime: endTime.addingTimeInterval(-duration),
+            startTime: recorder.startDate ?? endTime.addingTimeInterval(-duration),
             endTime: endTime,
             duration: duration,
             distance: recorder.distance,

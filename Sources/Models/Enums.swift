@@ -1,4 +1,40 @@
 import Foundation
+import SwiftUI
+
+// MARK: - Shared Workout Colors
+// Single source of truth for intensity and heart-rate zone colors, so every
+// screen displays the same visual language.
+
+enum WorkoutColors {
+    static func intensity(_ level: IntensityLevel) -> Color {
+        switch level {
+        case .easy: return Color(hex: "#9966CC") ?? .purple
+        case .moderate: return Color(hex: "#34C759") ?? .green
+        case .hard: return Color(hex: "#FF9500") ?? .orange
+        case .veryHard: return Color(hex: "#FF3B30") ?? .red
+        case .maximum: return Color(hex: "#E63333") ?? .red
+        }
+    }
+
+    static func heartRate(_ hr: Int, zoneMin: Int, zoneMax: Int) -> Color {
+        if hr < zoneMin { return .blue }
+        if hr <= zoneMax { return .green }
+        if hr <= zoneMax + 20 { return Color(.systemYellow) }
+        return .red
+    }
+}
+
+// MARK: - Haptics
+
+enum Haptics {
+    static func tap() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    static func success() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+}
 
 enum IntensityLevel: Int, Codable, CaseIterable {
     case easy = 1

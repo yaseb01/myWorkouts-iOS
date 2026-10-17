@@ -23,7 +23,7 @@ struct SettingsView: View {
                 NavigationLink {
                     GoalView()
                 } label: {
-                    Label("Settings.PersonalGoals".localized(), systemImage: "target")
+                    Label("Goals.PersonalGoals".localized(), systemImage: "target")
                 }
             }
 
@@ -42,17 +42,8 @@ struct SettingsView: View {
                     .foregroundStyle(.green)
             }
 
-            Section("Settings.Units".localized()) {
-                if let profile = profile {
-                    Picker("Settings.UnitSystem".localized(), selection: Binding(
-                        get: { profile.unitSystem },
-                        set: { profile.unitSystem = $0; try? modelContext.save() }
-                    )) {
-                        Text("Settings.Metric".localized()).tag(UnitSystem.metric)
-                        Text("Settings.Imperial".localized()).tag(UnitSystem.imperial)
-                    }
-                }
-            }
+            // Note: The unit-system setting is hidden until imperial conversion
+            // is actually implemented - the stored value was never applied anywhere.
 
             Section("Settings.Language".localized()) {
                 Picker("Settings.Language".localized(), selection: $languageManager.currentLanguage) {
@@ -130,7 +121,7 @@ struct EditHRZonesView: View {
                         Text("\(first.minHR) - \(last.maxHR)")
                             .font(.headline.monospacedDigit())
                             .foregroundStyle(.white)
-                        Text("Full Range (HR rest ... HR max)")
+                        Text("Zones.FullRange".localized())
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Text("0% - 100%")
@@ -174,14 +165,14 @@ struct EditHRZonesView: View {
             .onDelete(perform: deleteZones)
 
             Button { showAddZone = true } label: {
-                Label("Add Zone", systemImage: "plus")
+                Label("Zones.Add".localized(), systemImage: "plus")
             }
         }
-        .navigationTitle("Heart Rate Zones")
+        .navigationTitle("Settings.HeartRateZones".localized())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done") { dismiss() }
+                Button("Done".localized()) { dismiss() }
             }
         }
         .sheet(isPresented: $showAddZone) {
@@ -242,13 +233,13 @@ struct AddZoneSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Zone Name") {
-                    TextField("Name", text: $name)
-                    TextField("Description (e.g., Easy / Recovery)", text: $description)
+                Section("Zones.NameSection".localized()) {
+                    TextField("Zones.Name".localized(), text: $name)
+                    TextField("Zones.DescriptionPlaceholder".localized(), text: $description)
                 }
-                Section("Heart Rate Range") {
+                Section("Zones.RangeSection".localized()) {
                     HStack {
-                        Text("Min HR")
+                        Text("HRZones.MinHR".localized())
                         Spacer()
                         TextField("bpm", value: $minHR, format: .number)
                             .multilineTextAlignment(.trailing)
@@ -256,7 +247,7 @@ struct AddZoneSheet: View {
                         Text("bpm").foregroundStyle(.secondary)
                     }
                     HStack {
-                        Text("Max HR")
+                        Text("HRZones.MaxHR".localized())
                         Spacer()
                         TextField("bpm", value: $maxHR, format: .number)
                             .multilineTextAlignment(.trailing)
@@ -265,14 +256,15 @@ struct AddZoneSheet: View {
                     }
                 }
             }
-            .navigationTitle("Add Zone")
+            .navigationTitle("Zones.AddTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel".localized()) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { onSave() }
+                    Button("Save".localized()) { onSave() }
                         .disabled(minHR >= maxHR)
                 }
             }
@@ -295,19 +287,19 @@ struct EditZoneSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Zone Info") {
-                    TextField("Name", text: $name)
-                    TextField("Description", text: $zoneDescription)
+                Section("Zones.InfoSection".localized()) {
+                    TextField("Zones.Name".localized(), text: $name)
+                    TextField("Zones.Description".localized(), text: $zoneDescription)
                     HStack {
-                        Text("Zone Number")
+                        Text("Zones.Number".localized())
                         Spacer()
                         Text("\(zone.zoneNumber)")
                             .foregroundStyle(.secondary)
                     }
                 }
-                Section("Heart Rate Range") {
+                Section("Zones.RangeSection".localized()) {
                     HStack {
-                        Text("Min HR")
+                        Text("HRZones.MinHR".localized())
                         Spacer()
                         TextField("bpm", value: $minHR, format: .number)
                             .multilineTextAlignment(.trailing)
@@ -315,7 +307,7 @@ struct EditZoneSheet: View {
                         Text("bpm").foregroundStyle(.secondary)
                     }
                     HStack {
-                        Text("Max HR")
+                        Text("HRZones.MaxHR".localized())
                         Spacer()
                         TextField("bpm", value: $maxHR, format: .number)
                             .multilineTextAlignment(.trailing)
@@ -324,14 +316,15 @@ struct EditZoneSheet: View {
                     }
                 }
             }
-            .navigationTitle("Edit Zone")
+            .navigationTitle("Zones.EditTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel".localized()) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Save".localized()) {
                         zone.name = name
                         zone.zoneDescription = zoneDescription
                         zone.minHR = Int(minHR)
@@ -405,11 +398,11 @@ struct EditSportTypesView: View {
             }
             .onDelete(perform: deleteSports)
         }
-        .navigationTitle("Workout Types")
+        .navigationTitle("Settings.WorkoutTypes".localized())
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("Done") { dismiss() }
+                Button("Done".localized()) { dismiss() }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -463,11 +456,11 @@ struct AddSportSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Sport Info") {
-                    TextField("Name (e.g., Indoor Cycling)", text: $name)
-                    TextField("Abbreviation (e.g., IC)", text: $abbr)
+                Section("Sport.InfoSection".localized()) {
+                    TextField("Sport.NamePlaceholder".localized(), text: $name)
+                    TextField("Sport.AbbrevPlaceholder".localized(), text: $abbr)
                 }
-                Section("Color") {
+                Section("Sport.Color".localized()) {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(colorOptions, id: \.self) { hex in
                             Circle()
@@ -489,14 +482,15 @@ struct AddSportSheet: View {
                     .padding(.vertical, 8)
                 }
             }
-            .navigationTitle("Add Sport Type")
+            .navigationTitle("Sport.AddTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel".localized()) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { onSave() }
+                    Button("Save".localized()) { onSave() }
                         .disabled(name.isEmpty)
                 }
             }
@@ -525,11 +519,11 @@ struct EditSportSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Sport Info") {
-                    TextField("Name", text: $name)
-                    TextField("Abbreviation", text: $abbr)
+                Section("Sport.InfoSection".localized()) {
+                    TextField("Sport.Name".localized(), text: $name)
+                    TextField("Sport.Abbreviation".localized(), text: $abbr)
                 }
-                Section("Color") {
+                Section("Sport.Color".localized()) {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
                         ForEach(colorOptions, id: \.self) { hex in
                             Circle()
@@ -548,14 +542,15 @@ struct EditSportSheet: View {
                     .padding(.vertical, 8)
                 }
             }
-            .navigationTitle("Edit Sport Type")
+            .navigationTitle("Sport.EditTitle".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel".localized()) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Save".localized()) {
                         sport.name = name
                         sport.abbreviation = abbr
                         sport.color = selectedColor
@@ -588,36 +583,36 @@ struct EditProfileView: View {
 
     var body: some View {
         Form {
-            Section("Personal Information") {
-                Picker("Gender", selection: $gender) {
+            Section("Profile.PersonalInfo".localized()) {
+                Picker("Settings.Gender".localized(), selection: $gender) {
                     ForEach(Gender.allCases, id: \.self) { g in
                         Text(g.rawValue.capitalized).tag(g)
                     }
                 }
-                DatePicker("Birth Date", selection: $birthDate, displayedComponents: .date)
+                DatePicker("Settings.BirthDate".localized(), selection: $birthDate, in: ...Date(), displayedComponents: .date)
             }
-            Section("Measurements") {
+            Section("Profile.Measurements".localized()) {
                 HStack {
-                    Text("Weight"); Spacer()
+                    Text("Profile.Weight".localized()); Spacer()
                     TextField("kg", value: $weight, format: .number)
                         .multilineTextAlignment(.trailing).frame(width: 80)
                     Text("kg").foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("Height"); Spacer()
+                    Text("Profile.Height".localized()); Spacer()
                     TextField("cm", value: $height, format: .number)
                         .multilineTextAlignment(.trailing).frame(width: 80)
                     Text("cm").foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("VO2 Max"); Spacer()
+                    Text("Profile.VO2Max".localized()); Spacer()
                     TextField("ml/kg/min", value: $vo2max, format: .number)
                         .multilineTextAlignment(.trailing).frame(width: 80)
                     Text("ml/kg/min").foregroundStyle(.secondary)
                 }
             }
             Section {
-                Button("Save") {
+                Button("Save".localized()) {
                     if let profile = profile {
                         profile.gender = gender
                         profile.birthDate = birthDate
@@ -636,8 +631,9 @@ struct EditProfileView: View {
                 .font(.headline).frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle("Edit Profile")
+        .navigationTitle("Profile.EditTitle".localized())
         .navigationBarTitleDisplayMode(.inline)
+        .scrollDismissesKeyboard(.immediately)
         .onAppear {
             if let p = profile {
                 gender = p.gender ?? .preferNotToSay

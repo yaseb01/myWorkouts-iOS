@@ -28,7 +28,7 @@ struct ManualWorkoutView: View {
             }
 
             Section("Manual.Time".localized()) {
-                DatePicker("Manual.StartTime".localized(), selection: $startTime)
+                DatePicker("Manual.StartTime".localized(), selection: $startTime, in: ...Date())
                 HStack {
                     Text("Detail.Duration".localized())
                     Spacer()
@@ -95,6 +95,7 @@ struct ManualWorkoutView: View {
         }
         .navigationTitle("Manual.ManualEntry".localized())
         .navigationBarTitleDisplayMode(.inline)
+        .scrollDismissesKeyboard(.immediately)
     }
 
     private func saveWorkout() {

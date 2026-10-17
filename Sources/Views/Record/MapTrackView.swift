@@ -21,8 +21,11 @@ struct MapTrackView: UIViewRepresentable {
             let polyline = MKPolyline(coordinates: trackPoints, count: trackPoints.count)
             mapView.addOverlay(polyline)
 
-            // Auto-center on first point if we just started
-            if trackPoints.count == 2 {
+            // Center on the first point once the track exists. The jitter
+            // filter can make the point count jump 1 -> 3, so a fixed
+            // count check would never trigger.
+            if !context.coordinator.hasCenteredOnTrack {
+                context.coordinator.hasCenteredOnTrack = true
                 let region = MKCoordinateRegion(
                     center: trackPoints[0],
                     latitudinalMeters: 500,
@@ -30,6 +33,8 @@ struct MapTrackView: UIViewRepresentable {
                 )
                 mapView.setRegion(region, animated: true)
             }
+        } else {
+            context.coordinator.hasCenteredOnTrack = false
         }
 
         // Update current position marker
@@ -45,6 +50,8 @@ struct MapTrackView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
+        var hasCenteredOnTrack = false
+
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let polyline = overlay as? MKPolyline {
                 let renderer = MKPolylineRenderer(polyline: polyline)
@@ -101,12 +108,18 @@ struct StaticMapTrackView: UIViewRepresentable {
         let polyline = MKPolyline(coordinates: trackPoints, count: trackPoints.count)
         mapView.addOverlay(polyline)
 
-        let latSpan = (trackPoints.map(\.latitude).max()! - trackPoints.map(\.latitude).min()!) * 111_000 * 1.3
-        let avgLat = trackPoints.map(\.latitude).reduce(0, +) / Double(trackPoints.count)
-        let lonSpan = (trackPoints.map(\.longitude).max()! - trackPoints.map(\.longitude).min()!) * cos(avgLat * .pi / 180) * 111_000 * 1.3
+        // Fit the whole track: geographic center plus generous padding.
+        let lats = trackPoints.map(\.latitude)
+        let lons = trackPoints.map(\.longitude)
+        let center = CLLocationCoordinate2D(
+            latitude: (lats.min()! + lats.max()!) / 2,
+            longitude: (lons.min()! + lons.max()!) / 2
+        )
+        let latSpan = (lats.max()! - lats.min()!) * 111_000 * 1.3
+        let lonSpan = (lons.max()! - lons.min()!) * cos(center.latitude * .pi / 180) * 111_000 * 1.3
 
         let region = mapView.regionThatFits(MKCoordinateRegion(
-            center: trackPoints[trackPoints.count / 2],
+            center: center,
             latitudinalMeters: max(500, latSpan),
             longitudinalMeters: max(500, lonSpan)
         ))

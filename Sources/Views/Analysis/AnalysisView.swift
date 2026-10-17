@@ -101,7 +101,7 @@ struct AnalysisView: View {
                         let allHR = filteredWorkouts.flatMap { $0.sensorSamples.filter { $0.type == .heartRate } }
                         if allHR.count >= 2 {
                             Divider().background(Color.gray.opacity(0.3))
-                            chartSection(title: "Heart Rate") {
+                            chartSection(title: "Detail.HeartRate".localized()) {
                                 Chart {
                                     ForEach(allHR.prefix(200)) { sample in
                                         PointMark(
@@ -155,6 +155,7 @@ struct AnalysisView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Chart Section
