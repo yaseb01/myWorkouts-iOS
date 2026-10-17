@@ -26,6 +26,11 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
 
     func startTracking() {
+        // Requires the "location" background mode (declared in Info.plist);
+        // may only be set once location authorization has been granted.
+        if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
+            manager.allowsBackgroundLocationUpdates = true
+        }
         manager.startUpdatingLocation()
         isTrackingLocation = true
     }
@@ -46,6 +51,9 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         authorizationStatus = status
+        if status == .authorizedWhenInUse || status == .authorizedAlways, isTrackingLocation {
+            manager.allowsBackgroundLocationUpdates = true
+        }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

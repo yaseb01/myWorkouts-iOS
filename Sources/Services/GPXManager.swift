@@ -8,6 +8,7 @@ struct GPXManager {
     static func exportWorkout(_ workout: Workout) -> Data? {
         guard !workout.trackPoints.isEmpty else { return nil }
 
+        let sportName = workout.sportType?.name ?? "Workout"
         var gpx = """
         <?xml version="1.0" encoding="UTF-8"?>
         <gpx version="1.1" creator="myWorkouts"
@@ -15,12 +16,12 @@ struct GPXManager {
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
           <metadata>
-            <name>\(workout.sportType?.name ?? "Workout") - \(workout.startTime.formatted(date: .abbreviated, time: .shortened))</name>
+            <name>\(xmlEscape("\(sportName) - \(workout.startTime.formatted(date: .abbreviated, time: .shortened))"))</name>
             <time>\(workout.startTime.ISO8601Format())</time>
           </metadata>
           <trk>
-            <name>\(workout.sportType?.name ?? "Workout")</name>
-            <type>\(workout.sportType?.abbreviation ?? "WORKOUT")</type>
+            <name>\(xmlEscape(sportName))</name>
+            <type>\(xmlEscape(workout.sportType?.abbreviation ?? "WORKOUT"))</type>
             <trkseg>
         """
 
@@ -40,6 +41,15 @@ struct GPXManager {
         """
 
         return gpx.data(using: .utf8)
+    }
+
+    /// Escapes text for safe inclusion in XML element content.
+    private static func xmlEscape(_ text: String) -> String {
+        text.replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&apos;")
     }
 
     // MARK: - Import

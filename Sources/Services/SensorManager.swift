@@ -15,11 +15,15 @@ final class SensorManager: NSObject {
 
     private var centralManager: CBCentralManager?
     private var connectedPeripheral: CBPeripheral?
+    private var reconnectWorkItem: DispatchWorkItem?
 
     private let hrServiceUUID = CBUUID(string: "180D")
     private let hrMeasurementUUID = CBUUID(string: "2A37")
     private let batteryServiceUUID = CBUUID(string: "180F")
     private let batteryLevelUUID = CBUUID(string: "2A19")
+
+    /// Maximum automatic reconnection attempts after a lost connection.
+    private let maxReconnectionAttempts = 5
 
     override init() {
         super.init()
@@ -33,6 +37,7 @@ final class SensorManager: NSObject {
         }
         isScanning = true
         reconnectionAttempts = 0
+        reconnectWorkItem?.cancel()
         centralManager?.scanForPeripherals(withServices: [hrServiceUUID], options: nil)
     }
 
@@ -42,13 +47,18 @@ final class SensorManager: NSObject {
     }
 
     func disconnect() {
+        reconnectWorkItem?.cancel()
         if let peripheral = connectedPeripheral {
             centralManager?.cancelPeripheralConnection(peripheral)
         }
     }
 
     func manualReconnect() {
-        guard let peripheral = connectedPeripheral else { return }
+        guard let peripheral = connectedPeripheral else {
+            // Nothing to reconnect to - start a fresh scan instead.
+            startScanning()
+            return
+        }
         reconnectionAttempts += 1
         centralManager?.connect(peripheral, options: nil)
     }
@@ -58,20 +68,19 @@ final class SensorManager: NSObject {
 
 extension SensorManager: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        guard error == nil else { return }
+        guard error == nil, let data = characteristic.value else { return }
 
-        if characteristic.uuid == hrMeasurementUUID,
-           let data = characteristic.value {
+        if characteristic.uuid == hrMeasurementUUID, data.count >= 2 {
             let flags = data[0]
             var hr: Int = 0
             if flags & 0x01 == 0 {
                 hr = Int(data[1])
-            } else {
+            } else if data.count >= 3 {
                 hr = Int(UInt16(data[1]) | (UInt16(data[2]) << 8))
             }
             currentHeartRate = hr
         } else if characteristic.uuid == batteryLevelUUID,
-                  let data = characteristic.value {
+                  data.count >= 1 {
             batteryLevel = Int(data[0])
         }
     }
@@ -83,6 +92,22 @@ extension SensorManager: CBPeripheralDelegate {
                 peripheral.discoverCharacteristics([hrMeasurementUUID], for: service)
             } else if service.uuid == batteryServiceUUID {
                 peripheral.discoverCharacteristics([batteryLevelUUID], for: service)
+            }
+        }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let characteristics = service.characteristics else { return }
+        for characteristic in characteristics {
+            switch characteristic.uuid {
+            case hrMeasurementUUID:
+                // Subscribe to live heart rate notifications.
+                peripheral.setNotifyValue(true, for: characteristic)
+            case batteryLevelUUID:
+                peripheral.setNotifyValue(true, for: characteristic)
+                peripheral.readValue(for: characteristic)
+            default:
+                break
             }
         }
     }
@@ -126,6 +151,7 @@ extension SensorManager: CBCentralManagerDelegate {
         isConnected = true
         errorMessage = nil
         reconnectionAttempts = 0
+        reconnectWorkItem?.cancel()
         peripheral.delegate = self
         peripheral.discoverServices([hrServiceUUID, batteryServiceUUID])
     }
@@ -134,12 +160,21 @@ extension SensorManager: CBCentralManagerDelegate {
         isConnected = false
         currentHeartRate = 0
         lastDisconnectionTime = Date()
-        if connectedPeripheral != nil {
-            reconnectionAttempts += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                guard let self = self, let peripheral = self.connectedPeripheral else { return }
-                central.connect(peripheral, options: nil)
-            }
+
+        guard connectedPeripheral != nil else { return }
+        guard reconnectionAttempts < maxReconnectionAttempts else {
+            errorMessage = "Lost connection to heart rate sensor"
+            return
         }
+
+        reconnectionAttempts += 1
+        // Exponential backoff: 2s, 4s, 8s, 16s, 30s.
+        let delay = min(pow(2.0, Double(reconnectionAttempts)), 30.0)
+        let work = DispatchWorkItem { [weak self] in
+            guard let self, let target = self.connectedPeripheral, !self.isConnected else { return }
+            central.connect(target, options: nil)
+        }
+        reconnectWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 }

@@ -8,6 +8,7 @@ enum WorkoutState: Equatable {
     case completed
 }
 
+@MainActor
 @Observable
 final class WorkoutRecorder {
     var state: WorkoutState = .idle
@@ -19,11 +20,24 @@ final class WorkoutRecorder {
     var trackPoints: [TrackPointData] = []
     var sensorSamples: [SensorSampleData] = []
     var currentHeartRate: Int = 0
+    /// Wall-clock time at which the current recording session started.
+    private(set) var startDate: Date?
 
     private var timer: Timer?
     private var autoSaveTimer: Timer?
     private var lastLocationTimestamp: Date?
     private var lastAltitude: Double?
+
+    // Elapsed time is derived from the wall clock: Timers do not fire while
+    // the app is suspended, so incrementing a counter drifts and misses all
+    // time spent in the background.
+    private var baseElapsed: TimeInterval = 0
+    private var segmentStart: Date?
+
+    // Calories integrate the per-minute burn rate between HR samples (~1 Hz)
+    // instead of recomputing the whole total from the latest HR value.
+    private var lastHeartRate: Double = 0
+    private var lastHeartRateTime: Date?
 
     private var userWeight: Double?
     private var userAge: Int?
@@ -43,19 +57,30 @@ final class WorkoutRecorder {
         let unit: String
     }
 
+    struct IncompleteWorkoutData {
+        let date: Date
+        let duration: TimeInterval
+        let distance: Double
+    }
+
     init() {
-        checkForIncompleteWorkout()
+        self.hasIncompleteWorkout = UserDefaults.standard.bool(forKey: "hasIncompleteWorkout")
     }
 
     func start(weight: Double? = nil, age: Int? = nil, gender: Gender? = nil) {
         state = .recording
         elapsedSeconds = 0
+        baseElapsed = 0
+        segmentStart = nil
+        startDate = Date()
         distance = 0
         calories = 0
         elevationGain = 0
         trackPoints = []
         sensorSamples = []
         lastAltitude = nil
+        lastHeartRate = 0
+        lastHeartRateTime = nil
         userWeight = weight
         userAge = age
         userGender = gender
@@ -68,6 +93,8 @@ final class WorkoutRecorder {
         state = .paused
         stopTimer()
         stopAutoSave()
+        // Do not bill paused time to calories.
+        lastHeartRateTime = nil
     }
 
     func resume() {
@@ -78,9 +105,9 @@ final class WorkoutRecorder {
     }
 
     func stop() {
-        state = .completed
         stopTimer()
         stopAutoSave()
+        state = .completed
         hasIncompleteWorkout = false
         UserDefaults.standard.set(false, forKey: "hasIncompleteWorkout")
     }
@@ -96,14 +123,8 @@ final class WorkoutRecorder {
                 lat2: point.latitude, lon2: point.longitude
             )
             if timeDelta < 3.0 && distDelta < 2.0 { return }
-        }
 
-        if let last = trackPoints.last {
-            let delta = calculateDistance(
-                lat1: last.latitude, lon1: last.longitude,
-                lat2: point.latitude, lon2: point.longitude
-            )
-            distance += delta
+            distance += distDelta
         }
 
         if let alt = point.altitude {
@@ -121,8 +142,19 @@ final class WorkoutRecorder {
     func addHeartRate(_ value: Double) {
         guard state == .recording else { return }
         currentHeartRate = Int(value)
-        sensorSamples.append(SensorSampleData(timestamp: Date(), value: value, unit: "bpm"))
-        calories = calculateCalories(hr: value)
+
+        let now = Date()
+        if let lastTime = lastHeartRateTime, lastHeartRate > 0 {
+            // Cap the interval so sensor dropouts do not inflate the total.
+            let delta = min(now.timeIntervalSince(lastTime), 10)
+            if delta > 0 {
+                calories += caloriesPerMinute(hr: lastHeartRate) * delta / 60
+            }
+        }
+        lastHeartRate = value
+        lastHeartRateTime = now
+
+        sensorSamples.append(SensorSampleData(timestamp: now, value: value, unit: "bpm"))
     }
 
     func updateFromLocation(_ location: CLLocation) {
@@ -136,24 +168,62 @@ final class WorkoutRecorder {
         addTrackPoint(point)
     }
 
+    // MARK: - Incomplete Workout Recovery
+
+    /// Returns the persisted data of a workout that was interrupted by a
+    /// crash or force-quit, or nil when there is nothing worth recovering.
+    func readIncompleteWorkout() -> IncompleteWorkoutData? {
+        guard hasIncompleteWorkout else { return nil }
+        let defaults = UserDefaults.standard
+        let duration = defaults.double(forKey: "incompleteDuration")
+        // Ignore recordings that never really started.
+        guard duration >= 5 else {
+            clearIncompleteWorkout()
+            return nil
+        }
+        return IncompleteWorkoutData(
+            date: defaults.object(forKey: "incompleteDate") as? Date ?? Date(),
+            duration: duration,
+            distance: defaults.double(forKey: "incompleteDistance")
+        )
+    }
+
+    func clearIncompleteWorkout() {
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: "hasIncompleteWorkout")
+        defaults.removeObject(forKey: "incompleteDuration")
+        defaults.removeObject(forKey: "incompleteDistance")
+        defaults.removeObject(forKey: "incompleteDate")
+        hasIncompleteWorkout = false
+    }
+
     // MARK: - Private
 
     private func startTimer() {
+        segmentStart = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                self?.elapsedSeconds += 1
+                guard let self, let segmentStart = self.segmentStart else { return }
+                self.elapsedSeconds = self.baseElapsed + Date().timeIntervalSince(segmentStart)
             }
         }
     }
 
     private func stopTimer() {
+        if let segmentStart = segmentStart {
+            baseElapsed += Date().timeIntervalSince(segmentStart)
+            self.segmentStart = nil
+        }
+        elapsedSeconds = baseElapsed
         timer?.invalidate()
         timer = nil
     }
 
     private func startAutoSave() {
         autoSaveTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            self?.persistIncompleteWorkout()
+            Task { @MainActor in
+                self?.persistIncompleteWorkout()
+            }
         }
     }
 
@@ -163,13 +233,11 @@ final class WorkoutRecorder {
     }
 
     private func persistIncompleteWorkout() {
-        UserDefaults.standard.set(true, forKey: "hasIncompleteWorkout")
-        UserDefaults.standard.set(elapsedSeconds, forKey: "incompleteDuration")
-        UserDefaults.standard.set(distance, forKey: "incompleteDistance")
-    }
-
-    private func checkForIncompleteWorkout() {
-        hasIncompleteWorkout = UserDefaults.standard.bool(forKey: "hasIncompleteWorkout")
+        let defaults = UserDefaults.standard
+        defaults.set(true, forKey: "hasIncompleteWorkout")
+        defaults.set(elapsedSeconds, forKey: "incompleteDuration")
+        defaults.set(distance, forKey: "incompleteDistance")
+        defaults.set(Date(), forKey: "incompleteDate")
     }
 
     private func calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
@@ -183,22 +251,18 @@ final class WorkoutRecorder {
         return R * c
     }
 
-    private func calculateCalories(hr: Double) -> Double {
+    /// Heart-rate based burn rate in kcal/minute (Keytel-style formula).
+    private func caloriesPerMinute(hr: Double) -> Double {
         guard let weight = userWeight, let age = userAge else {
-            let minutes = elapsedSeconds / 60.0
-            return max(0, hr * minutes * 0.01)
+            // Rough fallback when no profile data is available.
+            return max(0, hr * 0.01)
         }
+        guard hr > 0 else { return 0 }
 
-        let minutes = elapsedSeconds / 60.0
-        guard minutes > 0, hr > 0 else { return 0 }
-
-        let caloriesPerMinute: Double
         if userGender == .female {
-            caloriesPerMinute = (0.4472 * hr + 0.1263 * weight + 0.074 * Double(age) - 20.4022) / 4.184
+            return max(0, (0.4472 * hr + 0.1263 * weight + 0.074 * Double(age) - 20.4022) / 4.184)
         } else {
-            caloriesPerMinute = (0.6309 * hr + 0.1988 * weight + 0.2017 * Double(age) - 55.0969) / 4.184
+            return max(0, (0.6309 * hr + 0.1988 * weight + 0.2017 * Double(age) - 55.0969) / 4.184)
         }
-
-        return max(0, caloriesPerMinute * minutes)
     }
 }
