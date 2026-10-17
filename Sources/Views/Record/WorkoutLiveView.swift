@@ -386,7 +386,7 @@ struct WorkoutLiveView: View {
                         Divider().background(Color.gray.opacity(0.3))
 
                         HStack(spacing: 0) {
-                            statColumn(label: "Detail.TargetZone".localized(), value: "\(intensity.minHR)..\(intensity.maxHR)", unit: "Timer.bpm".localized())
+                            statColumn(label: "Detail.TargetZone".localized(), value: "\(effectiveMinHR)..\(effectiveMaxHR)", unit: "Timer.bpm".localized())
                             statColumn(label: "Detail.TimeInZone".localized(), value: timeInZone, unit: "")
                             statColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgInZone))", unit: "Timer.bpm".localized())
                         }
@@ -763,7 +763,7 @@ struct WorkoutLiveView: View {
     }
 
     private func zoneColor(for hr: Int) -> Color {
-        WorkoutColors.heartRate(hr, zoneMin: intensity.minHR, zoneMax: intensity.maxHR)
+        WorkoutColors.heartRate(hr, zoneMin: effectiveMinHR, zoneMax: effectiveMaxHR)
     }
 
     private func zoneColor(for hr: Double) -> Color {

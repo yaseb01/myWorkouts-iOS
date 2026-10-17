@@ -461,7 +461,7 @@ struct WorkoutDetailView: View {
 
     private var timeInZone: String {
         let inZone = heartRateSamples.filter {
-            Int($0.value) >= workout.intensity.minHR && Int($0.value) <= workout.intensity.maxHR
+            Int($0.value) >= workout.effectiveMinHR && Int($0.value) <= workout.effectiveMaxHR
         }
         let seconds = Double(inZone.count)
         let m = Int(seconds) / 60
