@@ -73,6 +73,42 @@ final class myWorkoutsIntegrationTests: XCTestCase {
         XCTAssertEqual(recorder.state, .completed, "stop() transitions recording → completed")
     }
 
+    // MARK: - Incremental Heart-Rate Statistics
+
+    func testWorkoutRecorderHeartRateStats() throws {
+        let recorder = WorkoutRecorder()
+        recorder.start(zoneMin: 100, zoneMax: 150)
+        defer { recorder.stop() }
+
+        recorder.addHeartRate(90)   // below zone
+        recorder.addHeartRate(120)  // in zone
+        recorder.addHeartRate(160)  // above zone
+
+        XCTAssertEqual(recorder.heartRateValues.count, 3)
+        XCTAssertEqual(recorder.hrMin, 90)
+        XCTAssertEqual(recorder.hrMax, 160)
+        XCTAssertEqual(recorder.hrSum, 370)
+        XCTAssertEqual(recorder.hrBelowZone, 1)
+        XCTAssertEqual(recorder.hrInZone, 1)
+        XCTAssertEqual(recorder.hrAboveZone, 1)
+        XCTAssertEqual(recorder.hrInZoneSum, 120)
+    }
+
+    func testWorkoutRecorderHeartRateStatsResetOnStart() throws {
+        let recorder = WorkoutRecorder()
+        recorder.start(zoneMin: 100, zoneMax: 150)
+        recorder.addHeartRate(120)
+        recorder.stop()
+
+        recorder.start()
+        XCTAssertEqual(recorder.heartRateValues.count, 0)
+        XCTAssertEqual(recorder.hrSum, 0)
+        XCTAssertEqual(recorder.hrMin, 0)
+        XCTAssertEqual(recorder.hrMax, 0)
+        XCTAssertEqual(recorder.hrInZone, 0)
+        recorder.stop()
+    }
+
     // MARK: - Crash Recovery
 
     func testWorkoutRecorderDetectsIncompleteWorkout() throws {

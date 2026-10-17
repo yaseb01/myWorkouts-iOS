@@ -23,6 +23,21 @@ final class WorkoutRecorder {
     /// Wall-clock time at which the current recording session started.
     private(set) var startDate: Date?
 
+    // Heart-rate statistics, maintained incrementally (O(1) per sample) so
+    // views can read them on every render tick instead of re-aggregating the
+    // full sample array. The zone bounds come from the workout setup
+    // (custom range or intensity level).
+    private(set) var heartRateValues: [Double] = []
+    private(set) var hrSum: Double = 0
+    private(set) var hrMin: Double = 0
+    private(set) var hrMax: Double = 0
+    private(set) var hrBelowZone = 0
+    private(set) var hrInZone = 0
+    private(set) var hrAboveZone = 0
+    private(set) var hrInZoneSum: Double = 0
+    private var hrZoneMin = Int.min
+    private var hrZoneMax = Int.max
+
     private var timer: Timer?
     private var autoSaveTimer: Timer?
     private var lastLocationTimestamp: Date?
@@ -67,7 +82,8 @@ final class WorkoutRecorder {
         self.hasIncompleteWorkout = UserDefaults.standard.bool(forKey: "hasIncompleteWorkout")
     }
 
-    func start(weight: Double? = nil, age: Int? = nil, gender: Gender? = nil) {
+    func start(weight: Double? = nil, age: Int? = nil, gender: Gender? = nil,
+               zoneMin: Int? = nil, zoneMax: Int? = nil) {
         state = .recording
         elapsedSeconds = 0
         baseElapsed = 0
@@ -81,6 +97,16 @@ final class WorkoutRecorder {
         lastAltitude = nil
         lastHeartRate = 0
         lastHeartRateTime = nil
+        heartRateValues = []
+        hrSum = 0
+        hrMin = 0
+        hrMax = 0
+        hrBelowZone = 0
+        hrInZone = 0
+        hrAboveZone = 0
+        hrInZoneSum = 0
+        hrZoneMin = zoneMin ?? Int.min
+        hrZoneMax = zoneMax ?? Int.max
         userWeight = weight
         userAge = age
         userGender = gender
@@ -153,6 +179,26 @@ final class WorkoutRecorder {
         }
         lastHeartRate = value
         lastHeartRateTime = now
+
+        // Update the incremental statistics.
+        heartRateValues.append(value)
+        hrSum += value
+        if heartRateValues.count == 1 {
+            hrMin = value
+            hrMax = value
+        } else {
+            hrMin = min(hrMin, value)
+            hrMax = max(hrMax, value)
+        }
+        let hr = Int(value)
+        if hr < hrZoneMin {
+            hrBelowZone += 1
+        } else if hr <= hrZoneMax {
+            hrInZone += 1
+            hrInZoneSum += value
+        } else {
+            hrAboveZone += 1
+        }
 
         sensorSamples.append(SensorSampleData(timestamp: now, value: value, unit: "bpm"))
     }

@@ -14,18 +14,23 @@ struct MapTrackView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        // Update track overlay
-        mapView.removeOverlays(mapView.overlays)
+        let coordinator = context.coordinator
 
         if trackPoints.count >= 2 {
-            let polyline = MKPolyline(coordinates: trackPoints, count: trackPoints.count)
-            mapView.addOverlay(polyline)
+            // Rebuild the overlay only when new points arrived - not on
+            // every SwiftUI update (timer ticks, position marker moves).
+            if trackPoints.count != coordinator.lastPointCount {
+                mapView.removeOverlays(mapView.overlays)
+                let polyline = MKPolyline(coordinates: trackPoints, count: trackPoints.count)
+                mapView.addOverlay(polyline)
+                coordinator.lastPointCount = trackPoints.count
+            }
 
             // Center on the first point once the track exists. The jitter
             // filter can make the point count jump 1 -> 3, so a fixed
             // count check would never trigger.
-            if !context.coordinator.hasCenteredOnTrack {
-                context.coordinator.hasCenteredOnTrack = true
+            if !coordinator.hasCenteredOnTrack {
+                coordinator.hasCenteredOnTrack = true
                 let region = MKCoordinateRegion(
                     center: trackPoints[0],
                     latitudinalMeters: 500,
@@ -34,7 +39,11 @@ struct MapTrackView: UIViewRepresentable {
                 mapView.setRegion(region, animated: true)
             }
         } else {
-            context.coordinator.hasCenteredOnTrack = false
+            if coordinator.lastPointCount != 0 {
+                mapView.removeOverlays(mapView.overlays)
+                coordinator.lastPointCount = 0
+            }
+            coordinator.hasCenteredOnTrack = false
         }
 
         // Update current position marker
@@ -50,6 +59,7 @@ struct MapTrackView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, MKMapViewDelegate {
+        var lastPointCount = 0
         var hasCenteredOnTrack = false
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -100,6 +110,12 @@ struct StaticMapTrackView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
+        // Skip redundant updates - the track data of a saved workout rarely
+        // changes, but SwiftUI still calls updateUIView on every re-render.
+        let signature = trackSignature
+        if context.coordinator.lastSignature == signature { return }
+        context.coordinator.lastSignature = signature
+
         mapView.removeOverlays(mapView.overlays)
         mapView.removeAnnotations(mapView.annotations)
 
@@ -130,7 +146,24 @@ struct StaticMapTrackView: UIViewRepresentable {
         Coordinator()
     }
 
+    private var trackSignature: TrackSignature? {
+        guard let first = trackPoints.first, let last = trackPoints.last else { return nil }
+        return TrackSignature(count: trackPoints.count,
+                              firstLat: first.latitude, firstLon: first.longitude,
+                              lastLat: last.latitude, lastLon: last.longitude)
+    }
+
+    struct TrackSignature: Equatable {
+        let count: Int
+        let firstLat: Double
+        let firstLon: Double
+        let lastLat: Double
+        let lastLon: Double
+    }
+
     class Coordinator: NSObject, MKMapViewDelegate {
+        var lastSignature: TrackSignature?
+
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let polyline = overlay as? MKPolyline {
                 let renderer = MKPolylineRenderer(polyline: polyline)

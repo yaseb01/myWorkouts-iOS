@@ -388,7 +388,7 @@ struct WorkoutLiveView: View {
                         HStack(spacing: 0) {
                             statColumn(label: "Detail.TargetZone".localized(), value: "\(intensity.minHR)..\(intensity.maxHR)", unit: "Timer.bpm".localized())
                             statColumn(label: "Detail.TimeInZone".localized(), value: timeInZone, unit: "")
-                            statColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgHR))", unit: "Timer.bpm".localized())
+                            statColumn(label: "Detail.AvgInZone".localized(), value: "\(Int(avgInZone))", unit: "Timer.bpm".localized())
                         }
                     }
                     .padding()
@@ -606,12 +606,16 @@ struct WorkoutLiveView: View {
     // MARK: - HR Chart
 
     private var hrChart: some View {
-        let hrSamples = recorder.sensorSamples
-            .filter { $0.unit == "bpm" }
-            .enumerated()
-            .map { (offset, sample) in
-                HRDataPoint(index: offset, value: sample.value, timestamp: sample.timestamp)
-            }
+        // Downsample long workouts so the Chart works on a bounded number of
+        // points; always include the newest sample so the line reaches the edge.
+        let samples = recorder.sensorSamples
+        let step = max(1, samples.count / 400)
+        var hrSamples = samples.enumerated()
+            .filter { $0.offset % step == 0 }
+            .map { HRDataPoint(index: $0.offset, value: $0.element.value, timestamp: $0.element.timestamp) }
+        if let last = samples.last, hrSamples.last?.index != samples.count - 1 {
+            hrSamples.append(HRDataPoint(index: samples.count - 1, value: last.value, timestamp: last.timestamp))
+        }
 
         return Chart(hrSamples) { point in
             LineMark(
@@ -646,14 +650,14 @@ struct WorkoutLiveView: View {
     // MARK: - HR Histogram
 
     private var hrHistogram: some View {
-        let hrSamples = recorder.sensorSamples.filter { $0.unit == "bpm" }
-        let minVal = max(60, Int(hrSamples.map(\.value).min() ?? 60) - 10)
-        let maxVal = Int(hrSamples.map(\.value).max() ?? 180) + 10
+        let hrValues = recorder.heartRateValues
+        let minVal = max(60, Int(hrValues.min() ?? 60) - 10)
+        let maxVal = Int(hrValues.max() ?? 180) + 10
         let bucketSize = max(1, (maxVal - minVal) / 20)
 
         var buckets: [Int: Int] = [:]
-        for sample in hrSamples {
-            let bucket = (Int(sample.value) - minVal) / bucketSize
+        for value in hrValues {
+            let bucket = (Int(value) - minVal) / bucketSize
             buckets[bucket, default: 0] += 1
         }
 
@@ -675,16 +679,11 @@ struct WorkoutLiveView: View {
     // MARK: - Zone Bar
 
     private var zoneBar: some View {
-        let hrSamples = recorder.sensorSamples.filter { $0.unit == "bpm" }
-        let total = max(1, hrSamples.count)
+        let total = max(1, recorder.heartRateValues.count)
 
-        let belowZone = hrSamples.filter { Int($0.value) < effectiveMinHR }.count
-        let inZone = hrSamples.filter { Int($0.value) >= effectiveMinHR && Int($0.value) <= effectiveMaxHR }.count
-        let aboveZone = hrSamples.filter { Int($0.value) > effectiveMaxHR }.count
-
-        let belowPct = Double(belowZone) / Double(total) * 100
-        let inPct = Double(inZone) / Double(total) * 100
-        let abovePct = Double(aboveZone) / Double(total) * 100
+        let belowPct = Double(recorder.hrBelowZone) / Double(total) * 100
+        let inPct = Double(recorder.hrInZone) / Double(total) * 100
+        let abovePct = Double(recorder.hrAboveZone) / Double(total) * 100
 
         return GeometryReader { geo in
             HStack(spacing: 0) {
@@ -717,14 +716,15 @@ struct WorkoutLiveView: View {
     // MARK: - Zone Stats Row
 
     private var zoneStatsRow: some View {
-        let hrSamples = recorder.sensorSamples.filter { $0.unit == "bpm" }
-        let values = hrSamples.map(\.value)
+        let count = recorder.heartRateValues.count
+        let avgTotal = count > 0 ? recorder.hrSum / Double(count) : 0
+        let avgInZone = recorder.hrInZone > 0 ? recorder.hrInZoneSum / Double(recorder.hrInZone) : 0
 
         return HStack(spacing: 0) {
-            statColumn(label: "Min", value: "\(Int(values.min() ?? 0))", unit: "bpm")
-            statColumn(label: "Max", value: "\(Int(values.max() ?? 0))", unit: "bpm")
-            statColumn(label: "Avg total", value: "\(Int(values.reduce(0, +) / Double(max(1, values.count))))", unit: "bpm")
-            statColumn(label: "Avg in zone", value: "\(Int(avgHR))", unit: "bpm")
+            statColumn(label: "Min", value: "\(Int(recorder.hrMin))", unit: "bpm")
+            statColumn(label: "Max", value: "\(Int(recorder.hrMax))", unit: "bpm")
+            statColumn(label: "Avg total", value: "\(Int(avgTotal))", unit: "bpm")
+            statColumn(label: "Avg in zone", value: "\(Int(avgInZone))", unit: "bpm")
         }
         .padding()
     }
@@ -790,26 +790,27 @@ struct WorkoutLiveView: View {
     }
 
     private var timeInZone: String {
-        let hrSamples = recorder.sensorSamples.filter { $0.unit == "bpm" }
-        let inZone = hrSamples.filter { Int($0.value) >= intensity.minHR && Int($0.value) <= intensity.maxHR }
-        let seconds = Double(inZone.count)
-        let m = Int(seconds) / 60
-        let s = Int(seconds) % 60
+        // One sample ≈ one second at the ~1 Hz sample rate.
+        let seconds = recorder.hrInZone
+        let m = seconds / 60
+        let s = seconds % 60
         return String(format: "%02d:%02d", m, s)
     }
 
+    private var avgInZone: Double {
+        recorder.hrInZone > 0 ? recorder.hrInZoneSum / Double(recorder.hrInZone) : 0
+    }
+
     private var minHR: Double {
-        recorder.sensorSamples.filter { $0.unit == "bpm" }.map(\.value).min() ?? 0
+        recorder.hrMin
     }
 
     private var maxHR: Double {
-        recorder.sensorSamples.filter { $0.unit == "bpm" }.map(\.value).max() ?? 0
+        recorder.hrMax
     }
 
     private var avgHR: Double {
-        let samples = recorder.sensorSamples.filter { $0.unit == "bpm" }
-        guard !samples.isEmpty else { return 0 }
-        return samples.map(\.value).reduce(0, +) / Double(samples.count)
+        recorder.heartRateValues.isEmpty ? 0 : recorder.hrSum / Double(recorder.heartRateValues.count)
     }
 
     private func startWorkout() {
@@ -828,7 +829,8 @@ struct WorkoutLiveView: View {
             }
         }
 
-        recorder.start(weight: weight, age: age, gender: gender)
+        recorder.start(weight: weight, age: age, gender: gender,
+                       zoneMin: effectiveMinHR, zoneMax: effectiveMaxHR)
         if useGPS {
             locationManager.requestWhenInUseAuthorization()
             locationManager.startTracking()
@@ -907,14 +909,14 @@ struct WorkoutLiveView: View {
 // MARK: - Data Models
 
 struct HRDataPoint: Identifiable {
-    let id = UUID()
     let index: Int
     let value: Double
     let timestamp: Date
+    var id: Int { index }
 }
 
 struct HRBucket: Identifiable {
-    let id = UUID()
     let range: Int
     let count: Int
+    var id: Int { range }
 }
