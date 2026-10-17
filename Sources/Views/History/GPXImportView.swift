@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CoreLocation
 import UniformTypeIdentifiers
 
 struct GPXImportView: View {
@@ -261,25 +262,10 @@ struct GPXImportView: View {
     }
 
     private func distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
-        let R = 6_371_000.0
-        let dLat = (lat2 - lat1) * .pi / 180
-        let dLon = (lon2 - lon1) * .pi / 180
-        let a = sin(dLat / 2) * sin(dLat / 2) +
-                cos(lat1 * .pi / 180) * cos(lat2 * .pi / 180) *
-                sin(dLon / 2) * sin(dLon / 2)
-        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return R * c
+        GeoMath.haversineDistance(lat1: lat1, lon1: lon1, lat2: lat2, lon2: lon2)
     }
 
     private func formatDuration(_ seconds: TimeInterval) -> String {
-        let h = Int(seconds) / 3600
-        let m = (Int(seconds) % 3600) / 60
-        let s = Int(seconds) % 60
-        if h > 0 {
-            return String(format: "%d:%02d:%02d", h, m, s)
-        }
-        return String(format: "%02d:%02d", m, s)
+        DurationFormat.clock(seconds)
     }
 }
-
-import CoreLocation

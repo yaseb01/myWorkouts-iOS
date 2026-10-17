@@ -475,7 +475,7 @@ struct WorkoutDetailView: View {
         for i in 1..<workout.trackPoints.count {
             let prev = workout.trackPoints[i - 1]
             let curr = workout.trackPoints[i]
-            let dist = haversineDistance(
+            let dist = GeoMath.haversineDistance(
                 lat1: prev.latitude, lon1: prev.longitude,
                 lat2: curr.latitude, lon2: curr.longitude
             )
@@ -488,14 +488,7 @@ struct WorkoutDetailView: View {
     }
 
     private var formattedDuration: String {
-        let total = Int(workout.duration)
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        let s = total % 60
-        if h > 0 {
-            return String(format: "%d:%02d:%02d", h, m, s)
-        }
-        return String(format: "%02d:%02d", m, s)
+        DurationFormat.clock(workout.duration)
     }
 
     private var currentPace: String {
@@ -507,25 +500,7 @@ struct WorkoutDetailView: View {
     }
 
     private func formatDuration(_ seconds: TimeInterval) -> String {
-        let total = Int(seconds)
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        let s = total % 60
-        if h > 0 {
-            return String(format: "%d:%02d:%02d", h, m, s)
-        }
-        return String(format: "%02d:%02d", m, s)
-    }
-
-    private func haversineDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
-        let R = 6_371_000.0
-        let dLat = (lat2 - lat1) * .pi / 180
-        let dLon = (lon2 - lon1) * .pi / 180
-        let a = sin(dLat / 2) * sin(dLat / 2) +
-                cos(lat1 * .pi / 180) * cos(lat2 * .pi / 180) *
-                sin(dLon / 2) * sin(dLon / 2)
-        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return R * c
+        DurationFormat.clock(seconds)
     }
 
     private func exportGPX() {
@@ -571,48 +546,6 @@ struct WorkoutDetailView: View {
                 editIntensity = workout.intensity
             }
         }
-    }
-}
-
-// MARK: - Share Sheet
-
-struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
-
-// MARK: - Color Extension
-
-extension Color {
-    init?(hex: String) {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-
-        var rgb: UInt64 = 0
-        Scanner(string: hexSanitized).scanHexInt64(&rgb)
-
-        let length = hexSanitized.count
-        guard length == 6 || length == 8 else { return nil }
-
-        let r, g, b, a: Double
-        if length == 6 {
-            r = Double((rgb & 0xFF0000) >> 16) / 255
-            g = Double((rgb & 0x00FF00) >> 8) / 255
-            b = Double(rgb & 0x0000FF) / 255
-            a = 1.0
-        } else {
-            r = Double((rgb & 0xFF000000) >> 24) / 255
-            g = Double((rgb & 0x00FF0000) >> 16) / 255
-            b = Double((rgb & 0x0000FF00) >> 8) / 255
-            a = Double(rgb & 0x000000FF) / 255
-        }
-
-        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }
 

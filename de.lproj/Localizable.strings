@@ -104,7 +104,6 @@
 "HR.NoData" = "Keine Herzfrequenzdaten";
 "HR.ConnectSensor" = "Herzfrequenzsensor verbinden, um Daten zu sehen.";
 "HR.TimeTotal" = "Zeit gesamt";
-"HR.TimeInZone" = "Zeit in Zone";
 "HR.AvgTotal" = "Ø gesamt";
 
 /* Zones */
@@ -351,20 +350,6 @@
 "Home.Total" = "Gesamt";
 "Home.PerWeek7Days" = "Pro Woche (7 Tage)";
 
-/* Missing Keys - HomeView */
-"Home.LastWorkout" = "LETZTES TRAINING";
-"Home.START" = "START";
-"Home.Statistics" = "STATISTIK ÜBERSICHT";
-"Home.WeeklyGoals" = "WOCHENZIELE";
-"Home.NoWorkouts" = "Noch keine Trainings";
-"Home.Count" = "Anzahl";
-"Home.Duration" = "Dauer";
-"Home.Calories" = "Kalorien";
-"Home.Distance" = "Distanz";
-"Home.Incline" = "Steigung";
-"Home.PerWeek" = "Pro Woche";
-"Home.RelativeToReference" = "RELATIV ZUM REFERENZWERT";
-"Home.AbsoluteValues" = "ABSOLUTE WERTE";
 
 /* Missing Keys - GPX */
 "GPX.Import" = "GPX importieren";

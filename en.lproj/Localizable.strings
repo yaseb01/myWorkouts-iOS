@@ -104,7 +104,6 @@
 "HR.NoData" = "No heart rate data";
 "HR.ConnectSensor" = "Connect a heart rate sensor to see data here.";
 "HR.TimeTotal" = "Time total";
-"HR.TimeInZone" = "Time in zone";
 "HR.AvgTotal" = "Avg total";
 
 /* Zones */
@@ -351,20 +350,6 @@
 "Home.Total" = "Total";
 "Home.PerWeek7Days" = "Per Week (7 Days)";
 
-/* Missing Keys - HomeView */
-"Home.LastWorkout" = "LAST WORKOUT";
-"Home.START" = "START";
-"Home.Statistics" = "STATISTICS OVERVIEW";
-"Home.WeeklyGoals" = "WEEKLY GOALS";
-"Home.NoWorkouts" = "No workouts yet";
-"Home.Count" = "Count";
-"Home.Duration" = "Duration";
-"Home.Calories" = "Calories";
-"Home.Distance" = "Distance";
-"Home.Incline" = "Incline";
-"Home.PerWeek" = "Per Week";
-"Home.RelativeToReference" = "RELATIVE TO REFERENCE";
-"Home.AbsoluteValues" = "ABSOLUTE VALUES";
 
 /* Missing Keys - GPX */
 "GPX.Import" = "Import GPX";

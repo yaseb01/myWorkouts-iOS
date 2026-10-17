@@ -144,7 +144,7 @@ final class WorkoutRecorder {
         // Filter out jitter - require minimum 2m movement or 3 seconds between points
         if let last = trackPoints.last {
             let timeDelta = point.timestamp.timeIntervalSince(last.timestamp)
-            let distDelta = calculateDistance(
+            let distDelta = GeoMath.haversineDistance(
                 lat1: last.latitude, lon1: last.longitude,
                 lat2: point.latitude, lon2: point.longitude
             )
@@ -165,11 +165,12 @@ final class WorkoutRecorder {
         lastLocationTimestamp = point.timestamp
     }
 
-    func addHeartRate(_ value: Double) {
+    /// - Parameter now: Injectable timestamp so callers (and tests) can
+    ///   control the sample time; defaults to the current time.
+    func addHeartRate(_ value: Double, at now: Date = Date()) {
         guard state == .recording else { return }
         currentHeartRate = Int(value)
 
-        let now = Date()
         if let lastTime = lastHeartRateTime, lastHeartRate > 0 {
             // Cap the interval so sensor dropouts do not inflate the total.
             let delta = min(now.timeIntervalSince(lastTime), 10)
@@ -284,17 +285,6 @@ final class WorkoutRecorder {
         defaults.set(elapsedSeconds, forKey: "incompleteDuration")
         defaults.set(distance, forKey: "incompleteDistance")
         defaults.set(Date(), forKey: "incompleteDate")
-    }
-
-    private func calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
-        let R = 6_371_000.0
-        let dLat = (lat2 - lat1) * .pi / 180
-        let dLon = (lon2 - lon1) * .pi / 180
-        let a = sin(dLat / 2) * sin(dLat / 2) +
-                cos(lat1 * .pi / 180) * cos(lat2 * .pi / 180) *
-                sin(dLon / 2) * sin(dLon / 2)
-        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return R * c
     }
 
     /// Heart-rate based burn rate in kcal/minute (Keytel-style formula).

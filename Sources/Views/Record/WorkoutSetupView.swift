@@ -17,7 +17,6 @@ struct WorkoutSetupView: View {
     @State private var note: String = ""
     @State private var showLiveWorkout = false
     @State private var selectedTab = 0
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 0) {

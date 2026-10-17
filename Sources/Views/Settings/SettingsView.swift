@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query private var profiles: [UserProfile]
     @Query(sort: \SportType.name) private var sportTypes: [SportType]
     @Query(sort: \HeartRateZone.zoneNumber) private var hrZones: [HeartRateZone]

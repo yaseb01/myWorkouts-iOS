@@ -176,12 +176,6 @@ struct AnalysisView: View {
     // MARK: - Helpers
 
     private func formatDuration(_ seconds: TimeInterval) -> String {
-        let total = Int(seconds)
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        if h > 0 {
-            return "\(h)h \(m)m"
-        }
-        return "\(m)m"
+        DurationFormat.hoursMinutes(seconds)
     }
 }
